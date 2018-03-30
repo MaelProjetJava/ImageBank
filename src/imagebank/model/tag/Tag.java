@@ -2,26 +2,53 @@ package imagebank.model.tag;
 
 public class Tag extends TaggableObject {
 
-	private int hashCode;
-	private String name
+	private String name;
+	private boolean hasValue;
+	private long value;
+	private Tag unvaluedTagVersion;
+	private AVLTree<String,Image> taggedImages;
 
 	protected Tag(String name) {
 		super();
 		this.name = name;
-		hashCode = hashCode();
+		this.value = 0;
+		this.hasValue = false;
+		this.unvaluedTagVersion = this;
+	}
+
+	protected Tag(String name, long value) {
+		super();
+		this.name = name;
+		this.value = value;
+		this.hasValue = true;
+		this.unvaluedTagVersion = new Tag(name);
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	@Override
-	public int hashCode() {
-		return hashCode;
+	public long getValue() throws UnvaluedTagException {
+		if (!hasValue())
+			throw new UnvaluedTagException();
+
+		return value;
+	}
+
+	protected Tag getUnvaluedTag() {
+		return unvaluedTagVersion;
+	}
+
+	public Iterable<Image> getTaggedImages() {
+
+	}
+
+	public boolean hasValue() {
+		return hasValue;
 	}
 
 	@Override
 	public String toString() {
-		return getName();
+		return getName() + (hasValue() ? "=" + value : "");
 	}
 }
