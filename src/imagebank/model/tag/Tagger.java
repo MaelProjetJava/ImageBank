@@ -36,8 +36,15 @@ public class Tagger implements Serializable {
 
 	}
 
+	public static void untag(Image image, Tag tag) {
+
+	}
+
+	public static void untag(Tag tagged, Tag tagger) {
+
+	}
+
 	public static Iterable<Tag> getAllTags() {
 		return tags.values();
 	}
-
 }
