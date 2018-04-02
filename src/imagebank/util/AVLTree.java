@@ -26,8 +26,10 @@ public class AVLTree<K,V> implements SortedMap<K,V> {
 		}
 
 		@Override
-		public void setValue(V value) {
+		public V setValue(V value) {
+			V oldValue = this.value;
 			this.value = value;
+			return oldValue;
 		}
 
 		@Override
@@ -36,9 +38,11 @@ public class AVLTree<K,V> implements SortedMap<K,V> {
 		}
 
 		@Override
-		public boolean equals(Object o) {
-			if (!(o instanceof Node)
+		public boolean equals(Object other) {
+			if (!(other instanceof Node))
 				return false;
+
+			Node<?,?> o = (Node<?,?>) other;
 
 			boolean keysEquals;
 			if (this.getKey() == null)
@@ -60,7 +64,7 @@ public class AVLTree<K,V> implements SortedMap<K,V> {
 		@Override
 		public int hashCode() {
 			int a = getKey() == null ? 0 : getKey().hashCode();
-			int b = getValue() == null ? 0 : getValue.hashCOde();
+			int b = getValue() == null ? 0 : getValue().hashCode();
 			return a ^ b;
 		}
 	}
@@ -72,11 +76,11 @@ public class AVLTree<K,V> implements SortedMap<K,V> {
 		rootRightChild.leftChild = root;
 
 		if (rootRightChild.balance == 0) {
-			root.balance = 1;
-			rootRightChild.balance = -1;
+			root.balance = (char) 1;
+			rootRightChild.balance = (char) -1;
 		} else {
-			root.balance = 0;
-			rootRightChild.balance = 0;
+			root.balance = (char) 0;
+			rootRightChild.balance = (char) 0;
 		}
 
 		return rootRightChild;
@@ -89,11 +93,11 @@ public class AVLTree<K,V> implements SortedMap<K,V> {
 		rootLeftChild.rightChild = root;
 
 		if (rootLeftChild.balance == 0) {
-			root.balance = -1;
-			rootLeftChild.balance = 1;
+			root.balance = (char) -1;
+			rootLeftChild.balance = (char) 1;
 		} else {
-			root.balance = 0;
-			rootLeftChild.balance = 0;
+			root.balance = (char) 0;
+			rootLeftChild.balance = (char) 0;
 		}
 
 		return rootLeftChild;
@@ -106,19 +110,19 @@ public class AVLTree<K,V> implements SortedMap<K,V> {
 		root.leftChild = rootRightLeftChild.rightChild;
 		rootLeftChild.rightChild = rootRightLeftChild.leftChild;
 		rootRightLeftChild.rightChild = root;
-		rootRightLetChild.leftChild = rootLeftChild;
+		rootRightLeftChild.leftChild = rootLeftChild;
 
 		if (rootRightLeftChild.balance == 1) {
-			root.balance = 0;
-			rootLeftChild = -1;
+			root.balance = (char) 0;
+			rootLeftChild.balance = (char) -1;
 		} else if (rootRightLeftChild.balance == 0) {
-			root.balance = 0;
-			rootLeftChild = 0;
+			root.balance = (char) 0;
+			rootLeftChild.balance = (char) 0;
 		} else {
-			root.balance = 1;
-			rootLeftChild = 0;
+			root.balance = (char) 1;
+			rootLeftChild.balance = (char) 0;
 		}
-		rootRightLeftChild.balance = 0;
+		rootRightLeftChild.balance = (char) 0;
 
 		return rootRightLeftChild;
 	}
@@ -133,16 +137,16 @@ public class AVLTree<K,V> implements SortedMap<K,V> {
 		rootLeftRightChild.rightChild = rootRightChild;
 
 		if (rootLeftRightChild.balance == 1) {
-			root.balance = -1;
-			rootRightChild.balance = 0;
+			root.balance = (char) -1;
+			rootRightChild.balance = (char) 0;
 		} else if (rootLeftRightChild.balance == 0) {
-			root.balance = 0;
+			root.balance = (char) 0;
 			rootRightChild.balance = 0;
 		} else {
-			root.balance = 0;
-			rootRightChild.balance = 1;
+			root.balance = (char) 0;
+			rootRightChild.balance = (char) 1;
 		}
-		rootLeftRightChild.balance = 0;
+		rootLeftRightChild.balance = (char) 0;
 
 		return rootLeftRightChild;
 	}
