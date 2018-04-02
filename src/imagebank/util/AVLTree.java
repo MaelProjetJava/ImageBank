@@ -71,6 +71,11 @@ public class AVLTree<K,V> implements SortedMap<K,V> {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return stringify(root, "");
+	}
+
 	public static <K extends Comparable<K>,V> Deque<Node<K,V>>
 				buildPath(Node<K,V> root, Node<K,V> node) {
 
@@ -261,5 +266,19 @@ public class AVLTree<K,V> implements SortedMap<K,V> {
 		rootLeftRightChild.balance = (char) 0;
 
 		return rootLeftRightChild;
+	}
+
+	public static <K,V> String stringify(Node<K,V> root, String prefix) {
+		if (root == null)
+			return prefix + "(nil)\n";
+
+		StringBuilder strBuilder = new StringBuilder();
+
+		strBuilder.append(prefix).append(root.getKey()).append("\n");
+		strBuilder.append(prefix).append("|\\\n");
+		strBuilder.append(stringify(root.rightChild, prefix + "|"));
+		strBuilder.append(stringify(root.leftChild, prefix));
+
+		return strBuilder.toString();
 	}
 }
