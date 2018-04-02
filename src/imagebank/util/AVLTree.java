@@ -2,6 +2,8 @@ package imagebank.util;
 
 import java.util.SortedMap;
 import java.util.Map;
+import java.util.Deque;
+import java.util.ArrayDeque;
 
 public class AVLTree<K,V> implements SortedMap<K,V> {
 
@@ -67,6 +69,116 @@ public class AVLTree<K,V> implements SortedMap<K,V> {
 			int b = getValue() == null ? 0 : getValue().hashCode();
 			return a ^ b;
 		}
+	}
+
+	public static <K extends Comparable<K>,V> Deque<Node<K,V>>
+				buildPath(Node<K,V> root, Node<K,V> node) {
+
+		Deque<Node<K,V>> pathStack = new ArrayDeque<>();
+
+		Node<K,V> currentNode = root;
+		while (currentNode != null
+				&& currentNode.getKey()
+					.compareTo(node.getKey()) != 0) {
+
+			pathStack.addFirst(currentNode);
+
+			if (node.getKey().compareTo(currentNode.getKey()) > 0)
+				currentNode = currentNode.rightChild;
+			else
+				currentNode = currentNode.leftChild;
+		}
+
+		pathStack.addFirst(currentNode);
+		return pathStack;
+	}
+
+	public static <K extends Comparable<K>,V> Node<K,V>
+			insert(Deque<Node<K,V>> insertPath, Node<K,V> node) {
+
+		Node<K,V> leaf = insertPath.getFirst();
+
+		if (node.getKey().compareTo(leaf.getKey()) > 0)
+			leaf.rightChild = node;
+		else
+			leaf.leftChild = node;
+
+		insertPath.addFirst(node);
+		return retrace(1, insertPath);
+	}
+
+	private static <K,V> Node<K,V> retrace(int delta,
+				Deque<Node<K,V>> retracePath) {
+
+		Node<K,V> child = retracePath.removeFirst();
+		Node<K,V> parent = retracePath.removeFirst();
+
+		boolean heightChangeAbsorbed;
+		do {
+			if (child == parent.rightChild)
+				parent.balance += delta;
+			else
+				parent.balance -= delta;
+
+			if (parent.balance == 2)
+				parent = rebalanceRight(retracePath, parent);
+			else if (parent.balance == -2)
+				parent = rebalanceLeft(retracePath, parent);
+
+			child = parent;
+			int tmp = parent.balance == 0 ? 1 : 0;
+			heightChangeAbsorbed = (1 - delta) / 2 - tmp != 0;
+		} while (!heightChangeAbsorbed
+				&& (parent = retracePath.pollFirst()) != null);
+
+		/* On renvoit la nouvelle racine de l'arbre */
+		Node<K,V> root = retracePath.peekLast();
+		return root != null ? root : (parent != null ? parent : child);
+	}
+
+	private static <K,V> Node<K,V> rebalanceRight(
+			Deque<Node<K,V>> retracePath, Node<K,V> parent) {
+
+		Node<K,V> child = parent.rightChild;
+		Node<K,V> newParent;
+
+		if (child.balance == -1)
+			newParent = rotateRightLeft(parent);
+		else
+			newParent = rotateRightRight(parent);
+
+		Node<K,V> grandpa = retracePath.peekFirst();
+		if (grandpa != null)
+			changeChild(grandpa, newParent, parent);
+
+		return newParent;
+	}
+
+	private static <K,V> Node<K,V> rebalanceLeft(
+			Deque<Node<K,V>> retracePath, Node<K,V> parent) {
+
+		Node<K,V> child = parent.leftChild;
+		Node<K,V> newParent;
+
+		if (child.balance == 1)
+			newParent = rotateLeftRight(parent);
+		else
+			newParent = rotateLeftLeft(parent);
+
+		Node<K,V> grandpa = retracePath.peekFirst();
+		if (grandpa != null)
+			changeChild(grandpa, newParent, parent);
+
+		return newParent;
+	}
+
+	private static <K,V> void changeChild(Node<K,V> parent,
+				Node<K,V> newChild, Node<K,V> oldChild) {
+
+		if (oldChild == parent.leftChild)
+			parent.leftChild = newChild;
+		else
+			parent.rightChild = newChild;
 	}
 
 	private static <K,V> Node<K,V> rotateRightRight(Node<K,V> root) {
