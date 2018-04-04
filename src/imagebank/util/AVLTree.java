@@ -10,7 +10,7 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 				implements SortedMap<K,V>, Serializable {
 
 	public static class Node<K,V> extends AbstractMap.SimpleEntry<K,V> {
-		protected char balance;
+		protected byte balance;
 		protected Node<K,V> leftChild;
 		protected Node<K,V> rightChild;
 
@@ -145,11 +145,11 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		rootRightChild.leftChild = root;
 
 		if (rootRightChild.balance == 0) {
-			root.balance = (char) 1;
-			rootRightChild.balance = (char) -1;
+			root.balance = 1;
+			rootRightChild.balance = -1;
 		} else {
-			root.balance = (char) 0;
-			rootRightChild.balance = (char) 0;
+			root.balance = 0;
+			rootRightChild.balance = 0;
 		}
 
 		return rootRightChild;
@@ -162,11 +162,11 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		rootLeftChild.rightChild = root;
 
 		if (rootLeftChild.balance == 0) {
-			root.balance = (char) -1;
-			rootLeftChild.balance = (char) 1;
+			root.balance = -1;
+			rootLeftChild.balance = 1;
 		} else {
-			root.balance = (char) 0;
-			rootLeftChild.balance = (char) 0;
+			root.balance = 0;
+			rootLeftChild.balance = 0;
 		}
 
 		return rootLeftChild;
@@ -182,16 +182,16 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		rootRightLeftChild.leftChild = rootLeftChild;
 
 		if (rootRightLeftChild.balance == 1) {
-			root.balance = (char) 0;
-			rootLeftChild.balance = (char) -1;
+			root.balance = 0;
+			rootLeftChild.balance = -1;
 		} else if (rootRightLeftChild.balance == 0) {
-			root.balance = (char) 0;
-			rootLeftChild.balance = (char) 0;
+			root.balance = 0;
+			rootLeftChild.balance = 0;
 		} else {
-			root.balance = (char) 1;
-			rootLeftChild.balance = (char) 0;
+			root.balance = 1;
+			rootLeftChild.balance = 0;
 		}
-		rootRightLeftChild.balance = (char) 0;
+		rootRightLeftChild.balance = 0;
 
 		return rootRightLeftChild;
 	}
@@ -206,16 +206,16 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		rootLeftRightChild.rightChild = rootRightChild;
 
 		if (rootLeftRightChild.balance == 1) {
-			root.balance = (char) -1;
-			rootRightChild.balance = (char) 0;
+			root.balance = -1;
+			rootRightChild.balance = 0;
 		} else if (rootLeftRightChild.balance == 0) {
-			root.balance = (char) 0;
+			root.balance = 0;
 			rootRightChild.balance = 0;
 		} else {
-			root.balance = (char) 0;
-			rootRightChild.balance = (char) 1;
+			root.balance = 0;
+			rootRightChild.balance = 1;
 		}
-		rootLeftRightChild.balance = (char) 0;
+		rootLeftRightChild.balance = 0;
 
 		return rootLeftRightChild;
 	}
