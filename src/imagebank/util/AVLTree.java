@@ -89,6 +89,30 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		}
 	}
 
+	private Node<ComparableKey<K>,V> root;
+	private Comparator<? super K> userComparator;
+
+	public AVLTree() {
+		root = null;
+		userComparator = null;
+	}
+
+	public AVLTree(Comparator<? super K> comparator) {
+		root = null;
+		userComparator = comparator;
+	}
+
+	public AVLTree(Map<? extends K,? extends V> m) {
+		super();
+		putAll(m);
+	}
+
+	public AVLTree(SortedMap<K,? extends V> m) {
+		root = null;
+		userComparator = m.comparator();
+		putAll(m);
+	}
+
 	@Override
 	public String toString() {
 		return stringify(root, "");
