@@ -114,6 +114,51 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 	}
 
 	@Override
+	public V put(K key, V value) {
+		Node<ComparableKey<K>,V> newNode = new Node<>(
+			createComparableKey(key),
+			value
+		);
+
+		if (root == null) {
+			root = newNode;
+			return null;
+		}
+
+		Deque<PathStep<Node<ComparableKey<K>,V>>> insertPath
+						= buildPath(root, newNode);
+
+		PathStep<Node<ComparableKey<K>,V>> leafPathStep =
+							insertPath.getFirst();
+
+		Node<ComparableKey<K>,V> oldNode;
+		if (leafPathStep.getDirection() == Direction.RIGHT)
+			oldNode = leafPathStep.getNode().rightChild;
+		else
+			oldNode = leafPathStep.getNode().leftChild;
+
+		if (oldNode != null) {
+			V oldValue = oldNode.getValue();
+			oldNode.setValue(newNode.getValue());
+			return oldValue;
+		}
+
+		root = insert(insertPath, newNode);
+		return null;
+	}
+
+	private ComparableKey<K> createComparableKey(K key) {
+		ComparableKey<K> comparableKey;
+
+		if (userComparator != null)
+			comparableKey = ComparableKey.of(key, userComparator);
+		else
+			comparableKey = ComparableKey.of(key);
+
+		return comparableKey;
+	}
+
+	@Override
 	public String toString() {
 		return stringify(root, "");
 	}
