@@ -115,6 +115,9 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 
 	@Override
 	public V put(K key, V value) {
+		if (key == null)
+			throw new NullPointerException();
+
 		Node<ComparableKey<K>,V> newNode = new Node<>(
 			createComparableKey(key),
 			value
