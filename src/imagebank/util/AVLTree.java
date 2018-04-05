@@ -149,11 +149,8 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		PathStep<Node<ComparableKey<K>,V>> leafPathStep =
 							insertPath.getFirst();
 
-		Node<ComparableKey<K>,V> oldNode;
-		if (leafPathStep.getDirection() == Direction.RIGHT)
-			oldNode = leafPathStep.getNode().rightChild;
-		else
-			oldNode = leafPathStep.getNode().leftChild;
+		Node<ComparableKey<K>,V> oldNode =
+					getNodeFromPathStep(leafPathStep);
 
 		if (oldNode != null) {
 			V oldValue = oldNode.getValue();
@@ -174,6 +171,13 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			comparableKey = ComparableKey.of(key);
 
 		return comparableKey;
+	}
+
+	private <K,V> Node<K,V> getNodeFromPathStep(PathStep<Node<K,V>> step) {
+		if (step.getDirecction() == Direction.RIGHT)
+			return step.getNode().rightChild;
+		else
+			return step.getNode().leftChild;
 	}
 
 	@Override
