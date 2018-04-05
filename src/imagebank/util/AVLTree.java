@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.AbstractMap;
 import java.util.Deque;
 import java.util.ArrayDeque;
+import java.util.Comparator;
+import java.io.Serializable;
 
 public class AVLTree<K,V> extends AbstractMap<K,V>
 				implements SortedMap<K,V>, Serializable {
@@ -42,6 +44,48 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 
 		public Direction getDirection() {
 			return direction;
+		}
+	}
+
+	private static class NaturalComparator<T>
+					implements Comparator<T>, Serializable {
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public int compare(T o1, T o2) {
+			return ((Comparable<? super T>) o1).compareTo(o2);
+		}
+	}
+
+	private static class ComparableKey<T>
+			implements Comparable<ComparableKey<T>>, Serializable {
+
+		private Comparator<? super T> comparator;
+		private T key;
+
+		public static <T> ComparableKey<T> of(T key) {
+			ComparableKey<T> comparableKey = new ComparableKey<>();
+			comparableKey.key = key;
+			comparableKey.comparator = new NaturalComparator<T>();
+			return comparableKey;
+		}
+
+		public static <T> ComparableKey<T>
+				of(T key, Comparator<? super T> comparator) {
+			ComparableKey<T> comparableKey = new ComparableKey<>();
+			comparableKey.key = key;
+			comparableKey.comparator = comparator;
+			return comparableKey;
+		}
+
+		@Override
+		public int compareTo(ComparableKey<T> o) {
+			return comparator.compare(key, o.key);
+		}
+
+		@Override
+		public String toString() {
+			return key.toString();
 		}
 	}
 
