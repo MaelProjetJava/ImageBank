@@ -114,6 +114,21 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
+	public boolean containsKey(Object key) {
+		return search(root, createComparableKey((K) key)) != null;
+	}
+
+	@Override
+	public V get(Object key) {
+		@SuppressWarnings("unchecked")
+		Node<ComparableKey<K>,V> foundNode =
+				search(root, createComparableKey((K) key));
+
+		return foundNode != null ? foundNode.getValue() : null;
+	}
+
+	@Override
 	public V put(K key, V value) {
 		if (key == null)
 			throw new NullPointerException();
@@ -164,6 +179,22 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 	@Override
 	public String toString() {
 		return stringify(root, "");
+	}
+
+	public static <K extends Comparable<K>,V>
+			Node<K,V> search(Node<K,V> root, K key) {
+
+		Node<K,V> currentNode = root;
+		while (currentNode != null && currentNode.getKey()
+							.compareTo(key) != 0) {
+
+			if (key.compareTo(currentNode.getKey()) > 0)
+				currentNode = currentNode.rightChild;
+			else
+				currentNode = currentNode.leftChild;
+		}
+
+		return currentNode;
 	}
 
 	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
