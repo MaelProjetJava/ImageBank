@@ -20,7 +20,29 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			this.leftChild = null;
 			this.rightChild = null;
 		}
+	}
 
+	private enum Direction {
+		LEFT,
+		RIGHT
+	}
+
+	private static class PathStep<T> {
+		private T node;
+		private Direction direction;
+
+		public PathStep(T node, Direction direction) {
+			this.node = node;
+			this.direction = direction;
+		}
+
+		public T getNode() {
+			return node;
+		}
+
+		public Direction getDirection() {
+			return direction;
+		}
 	}
 
 	@Override
@@ -28,51 +50,55 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		return stringify(root, "");
 	}
 
-	public static <K extends Comparable<K>,V> Deque<Node<K,V>>
+	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
 				buildPath(Node<K,V> root, Node<K,V> node) {
 
-		Deque<Node<K,V>> pathStack = new ArrayDeque<>();
+		Deque<PathStep<Node<K,V>>> pathStack = new ArrayDeque<>();
 
 		Node<K,V> currentNode = root;
-		while (currentNode != null
-				&& currentNode.getKey()
+		while (currentNode != null && currentNode.getKey()
 					.compareTo(node.getKey()) != 0) {
 
-			pathStack.addFirst(currentNode);
-
-			if (node.getKey().compareTo(currentNode.getKey()) > 0)
+			if (node.getKey().compareTo(currentNode.getKey()) > 0) {
+				pathStack.addFirst(new PathStep<>(
+					currentNode, Direction.RIGHT
+				));
 				currentNode = currentNode.rightChild;
-			else
+			} else {
+				pathStack.addFirst(new PathStep<>(
+					currentNode, Direction.LEFT
+				));
 				currentNode = currentNode.leftChild;
+			}
 		}
 
-		pathStack.addFirst(currentNode);
 		return pathStack;
 	}
 
 	public static <K extends Comparable<K>,V> Node<K,V>
-			insert(Deque<Node<K,V>> insertPath, Node<K,V> node) {
+		insert(Deque<PathStep<Node<K,V>>> insertPath, Node<K,V> node) {
 
-		Node<K,V> leaf = insertPath.getFirst();
+		PathStep<Node<K,V>> leafPathStep = insertPath.getFirst();
 
-		if (node.getKey().compareTo(leaf.getKey()) > 0)
-			leaf.rightChild = node;
+		if (leafPathStep.getDirection() == Direction.RIGHT)
+			leafPathStep.getNode().rightChild = node;
 		else
-			leaf.leftChild = node;
+			leafPathStep.getNode().leftChild = node;
 
-		insertPath.addFirst(node);
 		return retrace(1, insertPath);
 	}
 
 	private static <K,V> Node<K,V> retrace(int delta,
-				Deque<Node<K,V>> retracePath) {
+				Deque<PathStep<Node<K,V>>> retracePath) {
 
-		Node<K,V> child = retracePath.removeFirst();
-		Node<K,V> parent = retracePath.removeFirst();
+		PathStep<Node<K,V>> pathStep = retracePath.removeFirst();
 
+		Node<K,V> parent;
 		boolean heightChangeAbsorbed;
 		do {
-			if (child == parent.rightChild)
+			parent = pathStep.getNode();
+
+			if (pathStep.getDirection() == Direction.RIGHT)
 				parent.balance += delta;
 			else
 				parent.balance -= delta;
@@ -82,19 +108,18 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			else if (parent.balance == -2)
 				parent = rebalanceLeft(retracePath, parent);
 
-			child = parent;
 			int tmp = parent.balance == 0 ? 1 : 0;
 			heightChangeAbsorbed = (1 - delta) / 2 - tmp != 0;
 		} while (!heightChangeAbsorbed
-				&& (parent = retracePath.pollFirst()) != null);
+			&& (pathStep = retracePath.pollFirst()) != null);
 
 		/* On renvoit la nouvelle racine de l'arbre */
-		Node<K,V> root = retracePath.peekLast();
-		return root != null ? root : (parent != null ? parent : child);
+		PathStep<Node<K,V>> rootPathStep = retracePath.peekLast();
+		return rootPathStep != null ? rootPathStep.getNode() : parent;
 	}
 
 	private static <K,V> Node<K,V> rebalanceRight(
-			Deque<Node<K,V>> retracePath, Node<K,V> parent) {
+		Deque<PathStep<Node<K,V>>> retracePath, Node<K,V> parent) {
 
 		Node<K,V> child = parent.rightChild;
 		Node<K,V> newParent;
@@ -104,15 +129,15 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		else
 			newParent = rotateRightRight(parent);
 
-		Node<K,V> grandpa = retracePath.peekFirst();
+		PathStep<Node<K,V>> grandpa = retracePath.peekFirst();
 		if (grandpa != null)
-			changeChild(grandpa, newParent, parent);
+			changeChild(grandpa.getNode(), newParent, parent);
 
 		return newParent;
 	}
 
 	private static <K,V> Node<K,V> rebalanceLeft(
-			Deque<Node<K,V>> retracePath, Node<K,V> parent) {
+		Deque<PathStep<Node<K,V>>> retracePath, Node<K,V> parent) {
 
 		Node<K,V> child = parent.leftChild;
 		Node<K,V> newParent;
@@ -122,9 +147,9 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		else
 			newParent = rotateLeftLeft(parent);
 
-		Node<K,V> grandpa = retracePath.peekFirst();
+		PathStep<Node<K,V>> grandpa = retracePath.peekFirst();
 		if (grandpa != null)
-			changeChild(grandpa, newParent, parent);
+			changeChild(grandpa.getNode(), newParent, parent);
 
 		return newParent;
 	}
