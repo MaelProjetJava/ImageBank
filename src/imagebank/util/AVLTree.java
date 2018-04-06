@@ -227,6 +227,63 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		return pathStack;
 	}
 
+	public static <K extends Comparable<K>,V>
+			Deque<PathStep<Node<K,V>>> first(Node<K,V> root) {
+
+		Deque<PathStep<Node<K,V>>> path = new ArrayDeque<>();
+
+		Node<K,V> currentNode = root;
+		while (currentNode.leftChild != null) {
+			path.addFirst(
+				new PathStep<>(currentNode, Direction.LEFT)
+			);
+
+			currentNode = currentNode.leftChild;
+		}
+
+		return path;
+	}
+
+	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
+			successor(Node<K,V> root,
+				Deque<PathStep<Node<K,V>>> currentPath) {
+
+		Node<K,V> currentNode;
+
+		if (currentPath.peekFirst() != null) {
+			currentNode =
+				getNodeFromPathStep(currentPath.getFirst());
+		} else {
+			currentNode = root;
+		}
+
+		if (currentNode.rightChild != null) {
+			currentPath.addFirst(
+				new PathStep<>(currentNode, Direction.RIGHT)
+			);
+			currentNode = currentNode.rightChild;
+
+			while (currentNode.leftChild != null) {
+				currentPath.addFirst(new PathStep<>(
+					currentNode, Direction.LEFT
+				));
+
+				currentNode = currentNode.leftChild;
+			}
+
+			return currentPath;
+		}
+
+		PathStep<Node<K,V>> currentStep;
+		do {
+			currentStep = currentPath.pollFirst();
+			if (currentStep == null)
+				return null;
+		} while (currentStep.getDirection() == Direction.RIGHT);
+
+		return currentPath;
+	}
+
 	public static <K extends Comparable<K>,V> Node<K,V>
 		insert(Deque<PathStep<Node<K,V>>> insertPath, Node<K,V> node) {
 
