@@ -173,8 +173,9 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		return comparableKey;
 	}
 
-	private <K,V> Node<K,V> getNodeFromPathStep(PathStep<Node<K,V>> step) {
-		if (step.getDirecction() == Direction.RIGHT)
+	private static <K,V> Node<K,V>
+				getNodeFromPathStep(PathStep<Node<K,V>> step) {
+		if (step.getDirection() == Direction.RIGHT)
 			return step.getNode().rightChild;
 		else
 			return step.getNode().leftChild;
