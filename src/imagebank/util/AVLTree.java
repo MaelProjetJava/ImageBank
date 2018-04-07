@@ -6,6 +6,7 @@ import java.util.AbstractMap;
 import java.util.Deque;
 import java.util.ArrayDeque;
 import java.util.Comparator;
+import java.util.NoSuchElementException;
 import java.io.Serializable;
 
 public class AVLTree<K,V> extends AbstractMap<K,V>
@@ -83,6 +84,10 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			return comparableKey;
 		}
 
+		public T getWrappedKey() {
+			return key;
+		}
+
 		@Override
 		public int compareTo(ComparableKey<T> o) {
 			return comparator.compare(key, o.key);
@@ -91,6 +96,70 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		@Override
 		public String toString() {
 			return key.toString();
+		}
+	}
+
+	private static class NodeWrapper<K,V> extends
+						AbstractMap.SimpleEntry<K,V> {
+
+		private Node<ComparableKey<K>,V> node;
+
+		public NodeWrapper(Node<ComparableKey<K>,V> node) {
+			super(null, null);
+			this.node = node;
+		}
+
+		@Override
+		public K getKey() {
+			return node.getKey().getWrappedKey();
+		}
+
+		@Override
+		public V getValue() {
+			return node.getValue();
+		}
+
+		@Override
+		public V setValue(V value) {
+			return node.setValue(value);
+		}
+
+	}
+
+	private class Iterator implements java.util.Iterator<Map.Entry<K,V>> {
+		private Deque<PathStep<Node<ComparableKey<K>,V>>> currentPath;
+		private NodeWrapper<K,V> currentNode;
+
+		public Iterator() {
+			currentPath = first(root);
+			currentNode = null;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return currentPath != null;
+		}
+
+		@Override
+		public Map.Entry<K,V> next() {
+			if (currentPath == null)
+				throw new NoSuchElementException();
+
+			currentNode = new NodeWrapper<>(
+				getNodeFromPath(root, currentPath)
+			);
+
+			currentPath = successor(root, currentPath);
+			return currentNode;
+		}
+
+		@Override
+		public void remove() {
+			if (currentNode == null)
+				throw new IllegalStateException();
+
+			AVLTree.this.remove(currentNode.getKey());
+			currentNode = null;
 		}
 	}
 
@@ -265,7 +334,10 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 	public static <K extends Comparable<K>,V>
 			Deque<PathStep<Node<K,V>>> first(Node<K,V> root) {
 
-		return leastDescendant(root, new ArrayDeque<>());
+		if (root != null)
+			return leastDescendant(root, new ArrayDeque<>());
+		else
+			return null;
 	}
 
 	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
