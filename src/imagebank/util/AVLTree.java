@@ -173,6 +173,15 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		return comparableKey;
 	}
 
+	private static <K,V> Node<K,V> getNodeFromPath(Node<K,V> root,
+					Deque<PathStep<Node<K,V>>> path) {
+
+		if (path.peekFirst() != null)
+			return getNodeFromPathStep(path.getFirst());
+		else
+			return root;
+	}
+
 	private static <K,V> Node<K,V>
 				getNodeFromPathStep(PathStep<Node<K,V>> step) {
 		if (step.getDirection() == Direction.RIGHT)
@@ -230,48 +239,22 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 	public static <K extends Comparable<K>,V>
 			Deque<PathStep<Node<K,V>>> first(Node<K,V> root) {
 
-		Deque<PathStep<Node<K,V>>> path = new ArrayDeque<>();
-
-		Node<K,V> currentNode = root;
-		while (currentNode.leftChild != null) {
-			path.addFirst(
-				new PathStep<>(currentNode, Direction.LEFT)
-			);
-
-			currentNode = currentNode.leftChild;
-		}
-
-		return path;
+		return leastDescendant(root, new ArrayDeque<>());
 	}
 
 	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
 			successor(Node<K,V> root,
 				Deque<PathStep<Node<K,V>>> currentPath) {
 
-		Node<K,V> currentNode;
-
-		if (currentPath.peekFirst() != null) {
-			currentNode =
-				getNodeFromPathStep(currentPath.getFirst());
-		} else {
-			currentNode = root;
-		}
+		Node<K,V> currentNode = getNodeFromPath(root, currentPath);
 
 		if (currentNode.rightChild != null) {
 			currentPath.addFirst(
 				new PathStep<>(currentNode, Direction.RIGHT)
 			);
+
 			currentNode = currentNode.rightChild;
-
-			while (currentNode.leftChild != null) {
-				currentPath.addFirst(new PathStep<>(
-					currentNode, Direction.LEFT
-				));
-
-				currentNode = currentNode.leftChild;
-			}
-
-			return currentPath;
+			return leastDescendant(root, currentPath);
 		}
 
 		PathStep<Node<K,V>> currentStep;
@@ -280,6 +263,23 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			if (currentStep == null)
 				return null;
 		} while (currentStep.getDirection() == Direction.RIGHT);
+
+		return currentPath;
+	}
+
+	private static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
+			leastDescendant(Node<K,V> root,
+				Deque<PathStep<Node<K,V>>> currentPath) {
+
+		Node<K,V> currentNode = getNodeFromPath(root, currentPath);
+
+		while (currentNode.leftChild != null) {
+			currentPath.addFirst(
+				new PathStep<>(currentNode, Direction.LEFT)
+			);
+
+			currentNode = currentNode.leftChild;
+		}
 
 		return currentPath;
 	}
