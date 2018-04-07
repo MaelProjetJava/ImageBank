@@ -45,6 +45,11 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		public Direction getDirection() {
 			return direction;
 		}
+
+		public void setNode(T node) {
+			this.node = node;
+		}
+
 	}
 
 	private static class NaturalComparator<T>
@@ -191,6 +196,22 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 	}
 
 	@Override
+	public V remove(Object key) {
+		@SuppressWarnings("unchecked")
+		Deque<PathStep<Node<ComparableKey<K>,V>>> deletePath
+				= buildPath(root, createComparableKey((K) key));
+
+		Node<ComparableKey<K>,V> nodeToDelete =
+					getNodeFromPath(root, deletePath);
+
+		if (nodeToDelete == null)
+			return null;
+
+		root = delete(deletePath, root);
+		return nodeToDelete.getValue();
+	}
+
+	@Override
 	public String toString() {
 		return stringify(root, "");
 	}
@@ -209,6 +230,11 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		}
 
 		return currentNode;
+	}
+
+	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
+				buildPath(Node<K,V> root, K key) {
+		return buildPath(root, new Node<>(key, null));
 	}
 
 	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
@@ -297,6 +323,55 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		return retrace(1, insertPath);
 	}
 
+	public static <K extends Comparable<K>,V> Node<K,V>
+		delete(Deque<PathStep<Node<K,V>>> deletePath, Node<K,V> root) {
+
+		Node<K,V> nodeToDelete = getNodeFromPath(root, deletePath);
+
+		if (nodeToDelete.leftChild != null
+					&& nodeToDelete.rightChild != null) {
+			deletePath = deleteWithChilds(deletePath, root);
+		} else {
+			if (nodeToDelete == root) {
+				if (nodeToDelete.leftChild != null)
+					return nodeToDelete.leftChild;
+				else if (nodeToDelete.rightChild != null)
+					return nodeToDelete.rightChild;
+				else
+					return null;
+			}
+
+			removeChild(deletePath.peekFirst().getNode(),
+								nodeToDelete);
+		}
+
+		return retrace(-1, deletePath);
+	}
+
+	private static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
+			deleteWithChilds(Deque<PathStep<Node<K,V>>> deletePath,
+							Node<K,V> root) {
+
+		Node<K,V> nodeToDelete = getNodeFromPath(root, deletePath);
+		PathStep<Node<K,V>> transientStep = new PathStep<>(
+			nodeToDelete,
+			Direction.RIGHT
+		);
+
+		deletePath.addFirst(transientStep);
+		deletePath = leastDescendant(root, deletePath);
+
+		Node<K,V> replacementNode = getNodeFromPath(root, deletePath);
+
+		removeChild(deletePath.getFirst().getNode(), replacementNode);
+		replacementNode.rightChild = nodeToDelete.rightChild;
+		replacementNode.leftChild = nodeToDelete.leftChild;
+		replacementNode.balance = nodeToDelete.balance;
+
+		transientStep.setNode(replacementNode);
+		return deletePath;
+	}
+
 	private static <K,V> Node<K,V> retrace(int delta,
 				Deque<PathStep<Node<K,V>>> retracePath) {
 
@@ -370,6 +445,22 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			parent.leftChild = newChild;
 		else
 			parent.rightChild = newChild;
+	}
+
+	private static <K,V>
+			void removeChild(Node<K,V> parent, Node<K,V> child) {
+
+		if (child.leftChild != null || child.rightChild != null) {
+			if (child.leftChild != null)
+				changeChild(parent, child.leftChild, child);
+			else
+				changeChild(parent, child.rightChild, child);
+		} else {
+			if (child == parent.leftChild)
+				parent.leftChild = null;
+			else
+				parent.rightChild = null;
+		}
 	}
 
 	private static <K,V> Node<K,V> rotateRightRight(Node<K,V> root) {
