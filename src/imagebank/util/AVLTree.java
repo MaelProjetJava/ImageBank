@@ -340,6 +340,15 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			return null;
 	}
 
+	public static <K extends Comparable<K>,V>
+			Deque<PathStep<Node<K,V>>> last(Node<K,V> root) {
+
+		if (root != null)
+			return greatestDescendant(root, new ArrayDeque<>());
+		else
+			return null;
+	}
+
 	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
 			successor(Node<K,V> root,
 				Deque<PathStep<Node<K,V>>> currentPath) {
@@ -365,6 +374,31 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		return currentPath;
 	}
 
+	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
+			predecessor(Node<K,V> root,
+				Deque<PathStep<Node<K,V>>> currentPath) {
+
+		Node<K,V> currentNode = getNodeFromPath(root, currentPath);
+
+		if (currentNode.leftChild != null) {
+			currentPath.addFirst(
+				new PathStep<>(currentNode, Direction.LEFT)
+			);
+
+			currentNode = currentNode.leftChild;
+			return greatestDescendant(root, currentPath);
+		}
+
+		PathStep<Node<K,V>> currentStep;
+		do {
+			currentStep = currentPath.pollFirst();
+			if (currentStep == null)
+				return null;
+		} while (currentStep.getDirection() == Direction.LEFT);
+
+		return currentPath;
+	}
+
 	private static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
 			leastDescendant(Node<K,V> root,
 				Deque<PathStep<Node<K,V>>> currentPath) {
@@ -377,6 +411,23 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			);
 
 			currentNode = currentNode.leftChild;
+		}
+
+		return currentPath;
+	}
+
+	private static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
+			greatestDescendant(Node<K,V> root,
+				Deque<PathStep<Node<K,V>>> currentPath) {
+
+		Node<K,V> currentNode = getNodeFromPath(root, currentPath);
+
+		while (currentNode.rightChild != null) {
+			currentPath.addFirst(
+				new PathStep<>(currentNode, Direction.RIGHT)
+			);
+
+			currentNode = currentNode.rightChild;
 		}
 
 		return currentPath;
