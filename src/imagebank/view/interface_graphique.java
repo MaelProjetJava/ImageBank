@@ -1,3 +1,5 @@
+package imagebank.view;
+
 import java.io.File;
 
 import javax.imageio.stream.ImageInputStream;
@@ -22,7 +24,7 @@ public class interface_graphique extends Application {
 		BorderPane border = new BorderPane();
 
 		//   ---LEFT---
-		ViewFlow flow = new ViewFlow();
+		ListImageView flow = new ListImageView();
 		border.setLeft(flow);
 		
 		ImageView pages[] = new ImageView[8];
@@ -33,15 +35,16 @@ public class interface_graphique extends Application {
 	    }
 	    
 	    //   ---BOTTOM---
+	    ControlView control = new ControlView();
+	    
 	    ControlButton previous = new ControlButton(new File("/D:/Funky_Creep/workspace/ProjetJava/images/previous.png"));
 	    ControlButton next = new ControlButton(new File("/D:/Funky_Creep/workspace/ProjetJava/images/next.png"));
 	    
-	    ViewControl control = new ViewControl();
 	    control.addToBox(previous);
 	    control.addToBox(next);
 	    border.setBottom(control);
 	    
-	    //previous.onClickAction();
+	    previous.onClickAction();
 	    //   ---ACTION BOUTON PREVIOUS---
 	    previous.setOnAction(new EventHandler<ActionEvent>() {
 	    	@Override public void handle (ActionEvent e) {
@@ -57,29 +60,13 @@ public class interface_graphique extends Application {
 	    	}
 	    });
 	    
-	    /*HBox hbox = new HBox();
-	    hbox.setAlignment(Pos.CENTER);
-	    hbox.setStyle("-fx-background-color: green;");
-	    //hbox.setHgrow(previous, Priority.ALWAYS);
-	    //hbox.setHgrow(next, Priority.ALWAYS);*/
-	    //hbox.getChildren().addAll(previous,next);
-	    
-	    //   ---CENTER---
-	    GridPane grid = new GridPane();
-	    border.setCenter(grid);
-	    grid.setStyle("-fx-background-color: yellow;");
+	    MainView main = new MainView();
+	    border.setCenter(main);
 	    
 		Scene scene = new Scene(border, 1800,1000);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-	
-	
-	private void button(String name,File f) {
-		Image image = new Image(f.toURI().toString(),50,50,true,true);
-	    Button btn = new Button();
-	    btn.setGraphic(new ImageView(image));
-	}
 	
  public static void main(String[] args) {
         launch(args);

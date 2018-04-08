@@ -1,10 +1,11 @@
+package imagebank.view;
+
 import javafx.geometry.Pos;
 import javafx.scene.layout.HBox;
-import ControlButton.java;
 
-public class ViewControl extends HBox {
+public class ControlView extends HBox {
 
-	public ViewControl() {
+	public ControlView() {
 		super();
 		this.setAlignment(Pos.CENTER);
 	    this.setStyle("-fx-background-color: green;");

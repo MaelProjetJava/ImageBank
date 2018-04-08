@@ -1,3 +1,5 @@
+package imagebank.view;
+
 import javafx.scene.image.*;
 import java.io.File;
 import java.net.MalformedURLException;
