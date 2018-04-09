@@ -6,6 +6,7 @@ import java.util.AbstractMap;
 import java.util.Deque;
 import java.util.ArrayDeque;
 import java.util.Comparator;
+import java.util.NoSuchElementException;
 import java.io.Serializable;
 
 public class AVLTree<K,V> extends AbstractMap<K,V>
@@ -45,6 +46,11 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		public Direction getDirection() {
 			return direction;
 		}
+
+		public void setNode(T node) {
+			this.node = node;
+		}
+
 	}
 
 	private static class NaturalComparator<T>
@@ -78,6 +84,10 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			return comparableKey;
 		}
 
+		public T getWrappedKey() {
+			return key;
+		}
+
 		@Override
 		public int compareTo(ComparableKey<T> o) {
 			return comparator.compare(key, o.key);
@@ -86,6 +96,70 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		@Override
 		public String toString() {
 			return key.toString();
+		}
+	}
+
+	private static class NodeWrapper<K,V> extends
+						AbstractMap.SimpleEntry<K,V> {
+
+		private Node<ComparableKey<K>,V> node;
+
+		public NodeWrapper(Node<ComparableKey<K>,V> node) {
+			super(null, null);
+			this.node = node;
+		}
+
+		@Override
+		public K getKey() {
+			return node.getKey().getWrappedKey();
+		}
+
+		@Override
+		public V getValue() {
+			return node.getValue();
+		}
+
+		@Override
+		public V setValue(V value) {
+			return node.setValue(value);
+		}
+
+	}
+
+	private class Iterator implements java.util.Iterator<Map.Entry<K,V>> {
+		private Deque<PathStep<Node<ComparableKey<K>,V>>> currentPath;
+		private NodeWrapper<K,V> currentNode;
+
+		public Iterator() {
+			currentPath = first(root);
+			currentNode = null;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return currentPath != null;
+		}
+
+		@Override
+		public Map.Entry<K,V> next() {
+			if (currentPath == null)
+				throw new NoSuchElementException();
+
+			currentNode = new NodeWrapper<>(
+				getNodeFromPath(root, currentPath)
+			);
+
+			currentPath = successor(root, currentPath);
+			return currentNode;
+		}
+
+		@Override
+		public void remove() {
+			if (currentNode == null)
+				throw new IllegalStateException();
+
+			AVLTree.this.remove(currentNode.getKey());
+			currentNode = null;
 		}
 	}
 
@@ -173,11 +247,37 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		return comparableKey;
 	}
 
-	private <K,V> Node<K,V> getNodeFromPathStep(PathStep<Node<K,V>> step) {
-		if (step.getDirecction() == Direction.RIGHT)
+	private static <K,V> Node<K,V> getNodeFromPath(Node<K,V> root,
+					Deque<PathStep<Node<K,V>>> path) {
+
+		if (path.peekFirst() != null)
+			return getNodeFromPathStep(path.getFirst());
+		else
+			return root;
+	}
+
+	private static <K,V> Node<K,V>
+				getNodeFromPathStep(PathStep<Node<K,V>> step) {
+		if (step.getDirection() == Direction.RIGHT)
 			return step.getNode().rightChild;
 		else
 			return step.getNode().leftChild;
+	}
+
+	@Override
+	public V remove(Object key) {
+		@SuppressWarnings("unchecked")
+		Deque<PathStep<Node<ComparableKey<K>,V>>> deletePath
+				= buildPath(root, createComparableKey((K) key));
+
+		Node<ComparableKey<K>,V> nodeToDelete =
+					getNodeFromPath(root, deletePath);
+
+		if (nodeToDelete == null)
+			return null;
+
+		root = delete(deletePath, root);
+		return nodeToDelete.getValue();
 	}
 
 	@Override
@@ -199,6 +299,11 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		}
 
 		return currentNode;
+	}
+
+	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
+				buildPath(Node<K,V> root, K key) {
+		return buildPath(root, new Node<>(key, null));
 	}
 
 	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
@@ -226,6 +331,57 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		return pathStack;
 	}
 
+	public static <K extends Comparable<K>,V>
+			Deque<PathStep<Node<K,V>>> first(Node<K,V> root) {
+
+		if (root != null)
+			return leastDescendant(root, new ArrayDeque<>());
+		else
+			return null;
+	}
+
+	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
+			successor(Node<K,V> root,
+				Deque<PathStep<Node<K,V>>> currentPath) {
+
+		Node<K,V> currentNode = getNodeFromPath(root, currentPath);
+
+		if (currentNode.rightChild != null) {
+			currentPath.addFirst(
+				new PathStep<>(currentNode, Direction.RIGHT)
+			);
+
+			currentNode = currentNode.rightChild;
+			return leastDescendant(root, currentPath);
+		}
+
+		PathStep<Node<K,V>> currentStep;
+		do {
+			currentStep = currentPath.pollFirst();
+			if (currentStep == null)
+				return null;
+		} while (currentStep.getDirection() == Direction.RIGHT);
+
+		return currentPath;
+	}
+
+	private static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
+			leastDescendant(Node<K,V> root,
+				Deque<PathStep<Node<K,V>>> currentPath) {
+
+		Node<K,V> currentNode = getNodeFromPath(root, currentPath);
+
+		while (currentNode.leftChild != null) {
+			currentPath.addFirst(
+				new PathStep<>(currentNode, Direction.LEFT)
+			);
+
+			currentNode = currentNode.leftChild;
+		}
+
+		return currentPath;
+	}
+
 	public static <K extends Comparable<K>,V> Node<K,V>
 		insert(Deque<PathStep<Node<K,V>>> insertPath, Node<K,V> node) {
 
@@ -237,6 +393,55 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			leafPathStep.getNode().leftChild = node;
 
 		return retrace(1, insertPath);
+	}
+
+	public static <K extends Comparable<K>,V> Node<K,V>
+		delete(Deque<PathStep<Node<K,V>>> deletePath, Node<K,V> root) {
+
+		Node<K,V> nodeToDelete = getNodeFromPath(root, deletePath);
+
+		if (nodeToDelete.leftChild != null
+					&& nodeToDelete.rightChild != null) {
+			deletePath = deleteWithChilds(deletePath, root);
+		} else {
+			if (nodeToDelete == root) {
+				if (nodeToDelete.leftChild != null)
+					return nodeToDelete.leftChild;
+				else if (nodeToDelete.rightChild != null)
+					return nodeToDelete.rightChild;
+				else
+					return null;
+			}
+
+			removeChild(deletePath.peekFirst().getNode(),
+								nodeToDelete);
+		}
+
+		return retrace(-1, deletePath);
+	}
+
+	private static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
+			deleteWithChilds(Deque<PathStep<Node<K,V>>> deletePath,
+							Node<K,V> root) {
+
+		Node<K,V> nodeToDelete = getNodeFromPath(root, deletePath);
+		PathStep<Node<K,V>> transientStep = new PathStep<>(
+			nodeToDelete,
+			Direction.RIGHT
+		);
+
+		deletePath.addFirst(transientStep);
+		deletePath = leastDescendant(root, deletePath);
+
+		Node<K,V> replacementNode = getNodeFromPath(root, deletePath);
+
+		removeChild(deletePath.getFirst().getNode(), replacementNode);
+		replacementNode.rightChild = nodeToDelete.rightChild;
+		replacementNode.leftChild = nodeToDelete.leftChild;
+		replacementNode.balance = nodeToDelete.balance;
+
+		transientStep.setNode(replacementNode);
+		return deletePath;
 	}
 
 	private static <K,V> Node<K,V> retrace(int delta,
@@ -312,6 +517,22 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			parent.leftChild = newChild;
 		else
 			parent.rightChild = newChild;
+	}
+
+	private static <K,V>
+			void removeChild(Node<K,V> parent, Node<K,V> child) {
+
+		if (child.leftChild != null || child.rightChild != null) {
+			if (child.leftChild != null)
+				changeChild(parent, child.leftChild, child);
+			else
+				changeChild(parent, child.rightChild, child);
+		} else {
+			if (child == parent.leftChild)
+				parent.leftChild = null;
+			else
+				parent.rightChild = null;
+		}
 	}
 
 	private static <K,V> Node<K,V> rotateRightRight(Node<K,V> root) {
