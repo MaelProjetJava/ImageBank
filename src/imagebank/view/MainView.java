@@ -2,18 +2,22 @@ package imagebank.view;
 
 import java.io.File;
 
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
 
 public class MainView extends BorderPane {
 
+	ControlButton left = new ControlButton(new File("/D:/Funky_Creep/workspace/ProjetJava/images/left.png"));
+    ControlButton right = new ControlButton(new File("/D:/Funky_Creep/workspace/ProjetJava/images/right.png"));
+	
 	public MainView() {
 		super();
 		this.setStyle("-fx-background-color: yellow;");
-		ControlButton left = new ControlButton(new File("/D:/Funky_Creep/workspace/ProjetJava/images/left.png"));
-	    ControlButton right = new ControlButton(new File("/D:/Funky_Creep/workspace/ProjetJava/images/right.png"));
 	    HBox hbox1 = new HBox();
 		hbox1.getChildren().add(left);
 		hbox1.setAlignment(Pos.CENTER);

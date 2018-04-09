@@ -13,13 +13,13 @@ public class ListImageView extends FlowPane {
 		this.setHgap(4);
 		this.setPrefWrapLength(350);
 		this.setStyle("-fx-background-color: DAE6F3;");
+		
+		ImageView pages[] = new ImageView[8];
+	    for (int i=0; i<8; i++) {
+	    	Image x = new Image("file:///D:/Funky_Creep/workspace/ProjetJava/images/image"+i+".jpg",150,150,true,true);
+	        pages[i] = new ImageView(x);
+	        this.getChildren().add(pages[i]);
+	    }
 	}
-	
-	/*ImageView pages[] = new ImageView[8];
-    for (int i=0; i<8; i++) {
-    	Image x = new Image("file:///D:/Funky_Creep/workspace/ProjetJava/images/image"+i+".jpg",150,150,true,true);
-        pages[i] = new ImageView(x);
-        flow.getChildren().add(pages[i]);
-    }*/
 
 }
