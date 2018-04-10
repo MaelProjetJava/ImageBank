@@ -107,25 +107,15 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		private Node<ComparableKey<K>,V> node;
 
 		public NodeWrapper(Node<ComparableKey<K>,V> node) {
-			super(null, null);
+			super(node.getKey().getWrappedKey(), node.getValue());
 			this.node = node;
 		}
 
 		@Override
-		public K getKey() {
-			return node.getKey().getWrappedKey();
-		}
-
-		@Override
-		public V getValue() {
-			return node.getValue();
-		}
-
-		@Override
 		public V setValue(V value) {
+			super.setValue(value);
 			return node.setValue(value);
 		}
-
 	}
 
 	private class Iterator implements java.util.Iterator<Map.Entry<K,V>> {
