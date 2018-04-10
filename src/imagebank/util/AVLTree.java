@@ -3,7 +3,9 @@ package imagebank.util;
 import java.util.SortedMap;
 import java.util.Map;
 import java.util.AbstractMap;
+import java.util.AbstractSet;
 import java.util.Deque;
+import java.util.Set;
 import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
@@ -170,8 +172,65 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		}
 	}
 
+	private class EntrySet extends AbstractSet<Map.Entry<K,V>> {
+
+		@Override
+		public void clear() {
+			root = null;
+		}
+
+		@Override
+		public boolean contains(Object o) {
+			@SuppressWarnings("unchecked")
+			Map.Entry<K,V> entry = (Map.Entry<K,V>) o;
+			Node<ComparableKey<K>,V> foundNode = search(root,
+					createComparableKey(entry.getKey()));
+
+			if (foundNode == null)
+				return false;
+
+			return foundNode.getValue().equals(entry.getValue());
+		}
+
+		@Override
+		public java.util.Iterator<Map.Entry<K,V>> iterator() {
+			return new Iterator();
+		}
+
+		@Override
+		public boolean remove(Object o) {
+			@SuppressWarnings("unchecked")
+			Map.Entry<K,V> entry = (Map.Entry<K,V>) o;
+
+			@SuppressWarnings("unchecked")
+			Deque<PathStep<Node<ComparableKey<K>,V>>> deletePath
+					= buildPath(root, createComparableKey(
+							entry.getKey()));
+
+			Node<ComparableKey<K>,V> nodeToDelete =
+				getNodeFromPath(root, deletePath);
+
+			if (nodeToDelete == null)
+				return false;
+			else if (!nodeToDelete.getValue()
+						.equals(entry.getValue()))
+				return false;
+
+			root = delete(deletePath, root);
+			size--;
+			return true;
+		}
+
+		@Override
+		public int size() {
+			return size;
+		}
+	}
+
 	private Node<ComparableKey<K>,V> root;
 	private Comparator<? super K> userComparator;
+	private int size = 0;
+	private Set<Map.Entry<K,V>> entrySet = null;
 
 	public AVLTree() {
 		root = null;
@@ -221,6 +280,7 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 
 		if (root == null) {
 			root = newNode;
+			size++;
 			return null;
 		}
 
@@ -240,6 +300,7 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		}
 
 		root = insert(insertPath, newNode);
+		size++;
 		return null;
 	}
 
@@ -284,7 +345,16 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			return null;
 
 		root = delete(deletePath, root);
+		size--;
 		return nodeToDelete.getValue();
+	}
+
+	@Override
+	public Set<Map.Entry<K,V>> entrySet() {
+		if (entrySet == null);
+			entrySet = new EntrySet();
+
+		return entrySet;
 	}
 
 	@Override
