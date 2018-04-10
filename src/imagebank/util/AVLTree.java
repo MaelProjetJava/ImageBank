@@ -99,6 +99,26 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		public String toString() {
 			return key.toString();
 		}
+
+		public boolean bounded(ComparableKey<T> lowerBound,
+						ComparableKey<T> upperBound) {
+			return lowerBounded(lowerBound)
+						&& upperBounded(upperBound);
+		}
+
+		public boolean lowerBounded(ComparableKey<T> lowerBound) {
+			if (lowerBound == null)
+				return true;
+			else
+				return compareTo(lowerBound) >= 0;
+		}
+
+		public boolean upperBounded(ComparableKey<T> upperBound) {
+			if (upperBound == null)
+				return true;
+			else
+				return compareTo(upperBound) < 0;
+		}
 	}
 
 	private static class NodeWrapper<K,V> extends
@@ -121,25 +141,50 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 	private class Iterator implements java.util.Iterator<Map.Entry<K,V>> {
 		private Deque<PathStep<Node<ComparableKey<K>,V>>> currentPath;
 		private NodeWrapper<K,V> currentNode;
+		private ComparableKey<K> upperBound;
 
 		public Iterator() {
 			currentPath = first(root);
 			currentNode = null;
+			upperBound = null;
+		}
+
+		public Iterator(ComparableKey<K> lowerBound,
+						ComparableKey<K> upperBound) {
+			this.currentNode = null;
+			this.upperBound = upperBound;
+
+			if (lowerBound == null) {
+				currentPath = first(root);
+				return;
+			}
+
+			currentPath = buildPath(root, lowerBound);
+			if (getNodeFromPath(root, currentPath) == null)
+				currentPath = successor(root, currentPath);
 		}
 
 		@Override
 		public boolean hasNext() {
-			return currentPath != null;
+			return currentPath != null &&
+				getNodeFromPath(root, currentPath).getKey()
+						.upperBounded(upperBound);
 		}
 
 		@Override
 		public Map.Entry<K,V> next() {
+			currentNode = null;
+
 			if (currentPath == null)
 				throw new NoSuchElementException();
 
-			currentNode = new NodeWrapper<>(
-				getNodeFromPath(root, currentPath)
-			);
+			Node<ComparableKey<K>,V> node =
+					getNodeFromPath(root, currentPath);
+
+			if (!node.getKey().upperBounded(upperBound))
+				throw new NoSuchElementException();
+
+			currentNode = new NodeWrapper<>(node);
 
 			currentPath = successor(root, currentPath);
 			return currentNode;
@@ -439,7 +484,7 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 
 		Node<K,V> currentNode = getNodeFromPath(root, currentPath);
 
-		if (currentNode.rightChild != null) {
+		if (currentNode != null && currentNode.rightChild != null) {
 			currentPath.addFirst(
 				new PathStep<>(currentNode, Direction.RIGHT)
 			);
@@ -464,7 +509,7 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 
 		Node<K,V> currentNode = getNodeFromPath(root, currentPath);
 
-		if (currentNode.leftChild != null) {
+		if (currentNode != null && currentNode.leftChild != null) {
 			currentPath.addFirst(
 				new PathStep<>(currentNode, Direction.LEFT)
 			);
