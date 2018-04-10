@@ -244,6 +244,11 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 	}
 
 	@Override
+	public Comparator<? super K> comparator() {
+		return userComparator;
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public boolean containsKey(Object key) {
 		return search(root, createComparableKey((K) key)) != null;
@@ -345,6 +350,18 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			entrySet = new EntrySet();
 
 		return entrySet;
+	}
+
+	@Override
+	public K firstKey() {
+		return getNodeFromPath(root, first(root)).getKey()
+							.getWrappedKey();
+	}
+
+	@Override
+	public K lastKey() {
+		return getNodeFromPath(root, last(root)).getKey()
+							.getWrappedKey();
 	}
 
 	@Override
