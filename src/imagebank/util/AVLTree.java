@@ -158,7 +158,14 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			if (currentNode == null)
 				throw new IllegalStateException();
 
+			Node<ComparableKey<K>,V> successor = null;
+			if (currentPath != null)
+				successor = getNodeFromPath(root, currentPath);
+
 			AVLTree.this.remove(currentNode.getKey());
+			if (successor != null)
+				currentPath = buildPath(root, successor);
+
 			currentNode = null;
 		}
 	}
