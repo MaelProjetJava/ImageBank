@@ -136,6 +136,10 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			super.setValue(value);
 			return node.setValue(value);
 		}
+
+		public ComparableKey<K> getComparableKey() {
+			return node.getKey();
+		}
 	}
 
 	private class Iterator implements java.util.Iterator<Map.Entry<K,V>> {
@@ -209,15 +213,44 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 
 	private class EntrySet extends AbstractSet<Map.Entry<K,V>> {
 
+		private ComparableKey<K> lowerBound;
+		private ComparableKey<K> upperBound;
+
+		public EntrySet() {
+			lowerBound = null;
+			upperBound = null;
+		}
+
+		public EntrySet(ComparableKey<K> lowerBound,
+						ComparableKey<K> upperBound) {
+			this.lowerBound = lowerBound;
+			this.upperBound = upperBound;
+		}
+
 		@Override
 		public void clear() {
-			root = null;
+			if (lowerBound == null && upperBound == null) {
+				root = null;
+				return;
+			}
+
+			java.util.Iterator<?> iter = iterator();
+
+			while (iter.hasNext()) {
+				iter.next();
+				iter.remove();
+			}
 		}
 
 		@Override
 		public boolean contains(Object o) {
 			@SuppressWarnings("unchecked")
 			Map.Entry<K,V> entry = (Map.Entry<K,V>) o;
+
+			if (!createComparableKey(entry.getKey())
+					.bounded(lowerBound, upperBound))
+				return false;
+
 			Node<ComparableKey<K>,V> foundNode = search(root,
 					createComparableKey(entry.getKey()));
 
@@ -229,7 +262,7 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 
 		@Override
 		public java.util.Iterator<Map.Entry<K,V>> iterator() {
-			return new Iterator();
+			return new Iterator(lowerBound, upperBound);
 		}
 
 		@Override
@@ -237,7 +270,10 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			@SuppressWarnings("unchecked")
 			Map.Entry<K,V> entry = (Map.Entry<K,V>) o;
 
-			@SuppressWarnings("unchecked")
+			if (!createComparableKey(entry.getKey())
+					.bounded(lowerBound, upperBound))
+				return false;
+
 			Deque<PathStep<Node<ComparableKey<K>,V>>> deletePath
 					= buildPath(root, createComparableKey(
 							entry.getKey()));
@@ -258,6 +294,17 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 
 		@Override
 		public int size() {
+			if (lowerBound == null && upperBound == null)
+				return size;
+
+			int size = 0;
+			java.util.Iterator<?> iter = iterator();
+
+			while (iter.hasNext()) {
+				size++;
+				iter.next();
+			}
+
 			return size;
 		}
 	}
