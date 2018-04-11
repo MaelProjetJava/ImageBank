@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
+import java.util.function.BiConsumer;
 import java.io.Serializable;
 
 public class AVLTree<K,V> extends AbstractMap<K,V>
@@ -592,48 +593,45 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		return stringify(root, "");
 	}
 
-	public static <K extends Comparable<K>,V>
-			Node<K,V> search(Node<K,V> root, K key) {
+	private static <K extends Comparable<K>,V> Node<K,V>
+			traverse(Node<K,V> root, K key,
+				BiConsumer<Node<K,V>,Direction> action) {
 
 		Node<K,V> currentNode = root;
 		while (currentNode != null && currentNode.getKey()
 							.compareTo(key) != 0) {
 
-			if (key.compareTo(currentNode.getKey()) > 0)
+			if (key.compareTo(currentNode.getKey()) > 0) {
+				action.accept(currentNode, Direction.RIGHT);
 				currentNode = currentNode.rightChild;
-			else
+			} else {
+				action.accept(currentNode, Direction.LEFT);
 				currentNode = currentNode.leftChild;
+			}
 		}
 
 		return currentNode;
 	}
 
-	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
-				buildPath(Node<K,V> root, K key) {
-		return buildPath(root, new Node<>(key, null));
+	public static <K extends Comparable<K>,V>
+			Node<K,V> search(Node<K,V> root, K key) {
+
+		return traverse(root, key, (node, dir) -> {});
 	}
 
 	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
 				buildPath(Node<K,V> root, Node<K,V> node) {
+		return buildPath(root, node.getKey());
+	}
+
+	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
+				buildPath(Node<K,V> root, K key) {
 
 		Deque<PathStep<Node<K,V>>> pathStack = new ArrayDeque<>();
 
-		Node<K,V> currentNode = root;
-		while (currentNode != null && currentNode.getKey()
-					.compareTo(node.getKey()) != 0) {
-
-			if (node.getKey().compareTo(currentNode.getKey()) > 0) {
-				pathStack.addFirst(new PathStep<>(
-					currentNode, Direction.RIGHT
-				));
-				currentNode = currentNode.rightChild;
-			} else {
-				pathStack.addFirst(new PathStep<>(
-					currentNode, Direction.LEFT
-				));
-				currentNode = currentNode.leftChild;
-			}
-		}
+		traverse(root, key, (node, dir) -> {
+			pathStack.addFirst(new PathStep<>(node, dir));
+		});
 
 		return pathStack;
 	}
