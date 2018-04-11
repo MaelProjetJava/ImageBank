@@ -157,15 +157,7 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 						ComparableKey<K> upperBound) {
 			this.currentNode = null;
 			this.upperBound = upperBound;
-
-			if (lowerBound == null) {
-				currentPath = first(root);
-				return;
-			}
-
-			currentPath = buildPath(root, lowerBound);
-			if (getNodeFromPath(root, currentPath) == null)
-				currentPath = successor(root, currentPath);
+			this.currentPath = firstBounded(root, lowerBound);
 		}
 
 		@Override
@@ -516,6 +508,20 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			return null;
 	}
 
+	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
+				firstBounded(Node<K,V> root, K lowerBound) {
+
+		if (lowerBound == null)
+			return first(root);
+
+		Deque<PathStep<Node<K,V>>> path = buildPath(root, lowerBound);
+
+		if (getNodeFromPath(root, path) == null)
+			path = successor(root, path);
+
+		return path;
+	}
+
 	public static <K extends Comparable<K>,V>
 			Deque<PathStep<Node<K,V>>> last(Node<K,V> root) {
 
@@ -523,6 +529,18 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			return greatestDescendant(root, new ArrayDeque<>());
 		else
 			return null;
+	}
+
+	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
+				lastBounded(Node<K,V> root, K upperBound) {
+
+		if (upperBound == null)
+			return last(root);
+
+		Deque<PathStep<Node<K,V>>> path = buildPath(root, upperBound);
+		path = predecessor(root, path);
+
+		return path;
 	}
 
 	public static <K extends Comparable<K>,V> Deque<PathStep<Node<K,V>>>
