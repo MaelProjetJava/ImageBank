@@ -809,6 +809,8 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 							Node<K,V> root) {
 
 		Node<K,V> nodeToDelete = getNodeFromPath(root, deletePath);
+		PathStep<Node<K,V>> deletedNodePath = deletePath.peekFirst();
+
 		PathStep<Node<K,V>> transientStep = new PathStep<>(
 			nodeToDelete,
 			Direction.RIGHT
@@ -823,6 +825,11 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		replacementNode.rightChild = nodeToDelete.rightChild;
 		replacementNode.leftChild = nodeToDelete.leftChild;
 		replacementNode.balance = nodeToDelete.balance;
+
+		if (deletedNodePath != null) {
+			changeChild(deletedNodePath.getNode(), replacementNode,
+								nodeToDelete);
+		}
 
 		transientStep.setNode(replacementNode);
 		return deletePath;
