@@ -301,6 +301,127 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		}
 	}
 
+	private class SubMap extends AbstractMap<K,V>
+						implements SortedMap<K,V> {
+
+		private ComparableKey<K> lowerBound;
+		private ComparableKey<K> upperBound;
+		private Set<Map.Entry<K,V>> entrySet = null;
+
+		public SubMap(K lowerBound, K upperBound) {
+			if (lowerBound == null && upperBound == null)
+				throw new NullPointerException();
+
+			/*
+			 * Ces lignes lèveront une ClassCastException si
+			 * approprié.
+			 */
+			this.lowerBound = createComparableKey(lowerBound);
+			this.upperBound = createComparableKey(upperBound);
+
+			if (this.lowerBound.compareTo(this.upperBound) > 0)
+				throw new IllegalArgumentException();
+		}
+
+		@Override
+		public Comparator<? super K> comparator() {
+			return AVLTree.this.comparator();
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public boolean containsKey(Object key) {
+			if (!createComparableKey((K) key)
+					.bounded(lowerBound, upperBound))
+				throw new IllegalArgumentException();
+
+			return AVLTree.this.containsKey(key);
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public V get(Object key) {
+			if (!createComparableKey((K) key)
+					.bounded(lowerBound, upperBound))
+				return null;
+
+			return AVLTree.this.get(key);
+		}
+
+		@Override
+		public Set<Map.Entry<K,V>> entrySet() {
+			if (entrySet == null)
+				entrySet = new EntrySet(lowerBound, upperBound);
+
+			return entrySet;
+		}
+
+		@Override
+		public K firstKey() {
+			return getNodeFromPath(root,
+					firstBounded(root, lowerBound))
+						.getKey().getWrappedKey();
+		}
+
+		@Override
+		public SortedMap<K,V> headMap(K toKey) {
+			if (!createComparableKey(toKey)
+					.bounded(lowerBound, upperBound))
+				throw new IllegalArgumentException();
+
+			return new SubMap(null, toKey);
+		}
+
+		@Override
+		public K lastKey() {
+			return getNodeFromPath(root,
+					lastBounded(root, upperBound))
+						.getKey().getWrappedKey();
+		}
+
+		@Override
+		public V put(K key, V value) {
+			if (!createComparableKey(key)
+					.bounded(lowerBound, upperBound))
+				throw new IllegalArgumentException();
+
+			return AVLTree.this.put(key, value);
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public V remove(Object key) {
+			if (!createComparableKey((K) key)
+					.bounded(lowerBound, upperBound))
+				return null;
+
+			return AVLTree.this.remove(key);
+		}
+
+		@Override
+		public SortedMap<K,V> subMap(K fromKey, K toKey) {
+			if (!createComparableKey(fromKey)
+					.bounded(lowerBound, upperBound))
+				throw new IllegalArgumentException();
+			else if (!createComparableKey(toKey)
+					.bounded(lowerBound, upperBound))
+				throw new IllegalArgumentException();
+			else if (fromKey == null || toKey == null)
+				throw new NullPointerException();
+
+			return new SubMap(fromKey, toKey);
+		}
+
+		@Override
+		public SortedMap<K,V> tailMap(K fromKey) {
+			if (!createComparableKey(fromKey)
+					.bounded(lowerBound, upperBound))
+				throw new IllegalArgumentException();
+
+			return new SubMap(fromKey, null);
+		}
+	}
+
 	private Node<ComparableKey<K>,V> root;
 	private Comparator<? super K> userComparator;
 	private int size = 0;
@@ -446,6 +567,24 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 	public K lastKey() {
 		return getNodeFromPath(root, last(root)).getKey()
 							.getWrappedKey();
+	}
+
+	@Override
+	public SortedMap<K,V> headMap(K toKey) {
+		return new SubMap(null, toKey);
+	}
+
+	@Override
+	public SortedMap<K,V> subMap(K fromKey, K toKey) {
+		if (fromKey == null || toKey == null)
+			throw new NullPointerException();
+
+		return new SubMap(fromKey, toKey);
+	}
+
+	@Override
+	public SortedMap<K,V> tailMap(K fromKey) {
+		return new SubMap(fromKey, null);
 	}
 
 	@Override
