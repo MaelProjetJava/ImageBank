@@ -10,6 +10,7 @@ import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
 import java.util.function.BiConsumer;
+import java.util.Objects;
 import java.io.Serializable;
 
 public class AVLTree<K,V> extends AbstractMap<K,V>
@@ -390,6 +391,15 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		}
 
 		@Override
+		public V putIfAbsent(K key, V value) {
+			if (!createComparableKey(key)
+					.bounded(lowerBound, upperBound))
+				throw new IllegalArgumentException();
+
+			return AVLTree.this.putIfAbsent(key, value);
+		}
+
+		@Override
 		@SuppressWarnings("unchecked")
 		public V remove(Object key) {
 			if (!createComparableKey((K) key)
@@ -397,6 +407,34 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 				return null;
 
 			return AVLTree.this.remove(key);
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public boolean remove(Object key, Object value) {
+			if (!createComparableKey((K) key)
+					.bounded(lowerBound, upperBound))
+				return false;
+
+			return AVLTree.this.remove(key, value);
+		}
+
+		@Override
+		public boolean replace(K key, V oldValue, V newValue) {
+			if (!createComparableKey(key)
+					.bounded(lowerBound, upperBound))
+				throw new IllegalArgumentException();
+
+			return AVLTree.this.replace(key, oldValue, newValue);
+		}
+
+		@Override
+		public V replace(K key, V value) {
+			if (!createComparableKey(key)
+					.bounded(lowerBound, upperBound))
+				throw new IllegalArgumentException();
+
+			return AVLTree.this.replace(key, value);
 		}
 
 		@Override
@@ -488,16 +526,49 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		Deque<PathStep<Node<ComparableKey<K>,V>>> insertPath
 						= buildPath(root, newNode);
 
-		PathStep<Node<ComparableKey<K>,V>> leafPathStep =
-							insertPath.getFirst();
-
-		Node<ComparableKey<K>,V> oldNode =
-					getNodeFromPathStep(leafPathStep);
+		Node<ComparableKey<K>,V> oldNode = getNodeFromPath(root,
+								insertPath);
 
 		if (oldNode != null) {
 			V oldValue = oldNode.getValue();
 			oldNode.setValue(newNode.getValue());
 			return oldValue;
+		}
+
+		root = insert(insertPath, newNode);
+		size++;
+		return null;
+	}
+
+	@Override
+	public V putIfAbsent(K key, V value) {
+		if (key == null)
+			throw new NullPointerException();
+
+		Node<ComparableKey<K>,V> newNode = new Node<>(
+			createComparableKey(key),
+			value
+		);
+
+		if (root == null) {
+			root = newNode;
+			size++;
+			return null;
+		}
+
+		Deque<PathStep<Node<ComparableKey<K>,V>>> insertPath
+						= buildPath(root, newNode);
+
+		Node<ComparableKey<K>,V> oldNode = getNodeFromPath(root,
+								insertPath);
+
+		if (oldNode != null) {
+			if (oldNode.getValue() != null) {
+				return oldNode.getValue();
+			} else {
+				oldNode.setValue(newNode.getValue());
+				return null;
+			}
 		}
 
 		root = insert(insertPath, newNode);
@@ -551,6 +622,26 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 	}
 
 	@Override
+	public boolean remove(Object key, Object value) {
+		@SuppressWarnings("unchecked")
+		Deque<PathStep<Node<ComparableKey<K>,V>>> deletePath
+				= buildPath(root, createComparableKey((K) key));
+
+		Node<ComparableKey<K>,V> nodeToDelete =
+					getNodeFromPath(root, deletePath);
+
+		if (nodeToDelete == null)
+			return false;
+
+		if (!Objects.equals(nodeToDelete.getValue(), value))
+			return false;
+
+		root = delete(deletePath, root);
+		size--;
+		return true;
+	}
+
+	@Override
 	public Set<Map.Entry<K,V>> entrySet() {
 		if (entrySet == null);
 			entrySet = new EntrySet();
@@ -573,6 +664,39 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 	@Override
 	public SortedMap<K,V> headMap(K toKey) {
 		return new SubMap(null, toKey);
+	}
+
+	@Override
+	public boolean replace(K key, V oldValue, V newValue) {
+		if (key == null)
+			throw new NullPointerException();
+
+		Node<ComparableKey<K>,V> node = search(root,
+						createComparableKey(key));
+
+		if (node != null && Objects.equals(node.getValue(), oldValue)) {
+			node.setValue(newValue);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public V replace(K key, V value) {
+		if (key == null)
+			throw new NullPointerException();
+
+		Node<ComparableKey<K>,V> node = search(root,
+						createComparableKey(key));
+
+		if (node != null) {
+			V oldValue = node.getValue();
+			node.setValue(value);
+			return oldValue;
+		} else {
+			return null;
+		}
 	}
 
 	@Override
