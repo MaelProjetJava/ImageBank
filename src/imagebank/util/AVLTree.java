@@ -251,7 +251,8 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			if (foundNode == null)
 				return false;
 
-			return foundNode.getValue().equals(entry.getValue());
+			return Objects.equals(foundNode.getValue(),
+							entry.getValue());
 		}
 
 		@Override
@@ -277,8 +278,8 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 
 			if (nodeToDelete == null)
 				return false;
-			else if (!nodeToDelete.getValue()
-						.equals(entry.getValue()))
+			else if (!Objects.equals(nodeToDelete.getValue(),
+							entry.getValue()))
 				return false;
 
 			root = delete(deletePath, root);
