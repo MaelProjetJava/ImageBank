@@ -55,6 +55,10 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 			this.node = node;
 		}
 
+		@Override
+		public String toString() {
+			return node.toString() + ":" + direction.toString();
+		}
 	}
 
 	private static class NaturalComparator<T>
