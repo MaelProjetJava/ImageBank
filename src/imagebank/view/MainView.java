@@ -12,8 +12,8 @@ import javafx.scene.Scene;
 
 public class MainView extends BorderPane {
 
-	ControlButton left = new ControlButton(new File("/D:/Funky_Creep/workspace/ProjetJava/images/left.png"));
-    ControlButton right = new ControlButton(new File("/D:/Funky_Creep/workspace/ProjetJava/images/right.png"));
+	public ControlButton left = new ControlButton(new File("/D:/Funky_Creep/workspace/ProjetJava/images/left.png"));
+    public ControlButton right = new ControlButton(new File("/D:/Funky_Creep/workspace/ProjetJava/images/right.png"));
 	
 	public MainView() {
 		super();
