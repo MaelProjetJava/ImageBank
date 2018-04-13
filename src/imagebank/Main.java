@@ -1,6 +1,8 @@
 package imagebank;
 
 import javafx.application.Application;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -13,8 +15,17 @@ public class Main extends Application {
 	}
 
 	@Override
-	public void start(Stage primaryState) throws Exception {
+	public void start(Stage primaryStage) throws Exception {
 		controller.start(primaryStage);
+		
+		StackPane root = new StackPane();
+		ImageView iv = new ImageView();
+		Image img = new Image();
+		
+		iv.setImage(img);
+		root.getChildren().add(iv);
+		Scene scene  = new Scene(root);
+		
 	}
 
 	public static void main(String args[]) {

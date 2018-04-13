@@ -1,81 +1,148 @@
 package imagebank.model;
 
-import java.util.ArrayList;
+import java.io.IOException;
 
-import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+
+import javax.imageio.ImageReader;
+
 public class DominantColor {
-	private ArrayList<Color> colors;
-	private Color[] refColors;
-	private int sizeRefColors;
-	private Image img;	
-	
-	public DominantColor(String img_filename) {
-		this.colors = new ArrayList<Color>();
-		this.refColors = {Color.black, Color.white, Color.cyan,
-			Color.yellow, Color.red, Color.blue, Color.green,
-			Color.magenta };
-		this.img = new Image("file:/"+img_filename);
-	}
-	
-	public void getDominantColor(){
-		PixelReader pix_reader = this.img.getPixelReader();
-		double width = this.img.getWidth();
-		double height = this.img.getHeight();
+	private final Color[] refColor = {
+			Color.rgb(230,20,20),Color.rgb(152,103,52),Color.rgb(230,230,75),Color.rgb(20,230,20),
+			Color.rgb(75,230,230),Color.rgb(52,103,152),Color.rgb(20,20,230),Color.rgb(152,52,103),
+			Color.rgb(230,75,230),Color.rgb(223,223,233),Color.rgb(160,160,160),Color.rgb(96,96,96),
+			Color.rgb(32,32,32)};
+	protected String[] name_colors = {"Red", "Brown", "Yellow", "Green","Cyan", "DarkCyan", "Blue",
+			"DarkMagenta", "Magenta", "White", "LighGray", "Gray", "DarkGray", "Black"};
+	public ArrayList<Color> d_colors;
+
+	public DominantColor() {
 		
-	}
+	}	
 	
-	public Color distanceColors(Color img_pix){
-		int r = img_pix.getRed();
-		int g = img_pix.getGreen();
-		int b = img_pix.getBlue();
-		int img_main_canals = this.twoMainCanals(r,g,b);
-		Color colSelected = this.refColors[0];
-		for(int i=1; i<this.sizeRefColors; i++){
-			Color c = this.refColors[i];
-			int col_main_canals = this.twoMainCanals(c.getRed(),
-						     c.getGreen(), c.getBlue());
-			if(sameMainCanals(img_main_canals, col_main_canals)){
-				
-			}	
-	}
-	
-	public int[] getDistanceColors(Color img_color, Color col, int[] can){
-		int[] distance = {0,0,0};
-		distance[0]
+	public ArrayList<Color> getDominantColor(ImageReader img_reader, PixelReader pix_reader) throws IOException {
+		int[] nb_ref_colors = this.countRefColors(img_reader, pix_reader);
+		this.d_colors = this.mainColors(nb_ref_colors); 
+		return this.d_colors; 
 	}
 
-	public boolean sameMainCanals(int[] img_can, int[] col_can){
-		return img_can[0]==col_can[0] && img_can[1]==col_man[1]&&
-							img_can[2]==col_man[2];
+	public String[] getNameDominantColor(){
+		String[] name_color = {"", ""};
+		for(int i=0; i<this.refColor.length; i++){
+			if(this.refColor[i].equals(this.d_colors.get(0)))
+				name_color[0] = this.name_colors[i];
+			if(this.refColor[i].equals(this.d_colors.get(1)))
+				name_color[1] = this.name_colors[i];
+		}
+		return name_color;
 	}
 
-	public twoMainCanal(int r, int g, int b){
-		int main_canals = {0,0,0};
-		if(r>=g && r>=b){
-			main_canals[0] = 1;
-			if(g>=b){
-				main_canals[1] = 1;
-			}else{
-				main_canals[2] = 1;
+	public ArrayList<Color> mainColors(int[] nb_ref_colors){
+		ArrayList<Color> main_colors = new ArrayList<Color>();
+		int first = 0;
+		int second = 1;
+		for(int i=2; i<this.refColor.length; i++) {
+			if(nb_ref_colors[first]<nb_ref_colors[i]) {
+				if(nb_ref_colors[second]<nb_ref_colors[first])
+					second = first;
+				first = i;
 			}
-		else if(g>=r && g>=b){
-			main_canals[1] = 1;
-			if(r>=b){
-				main_canals[0] = 1;
-			}else{
-				main_canals[2] = 1;
-			}
-		}else{
-			main_canals[2] = 1;
-			if(r>=g){
-				main_canals[0] = 1;
-			}else{
-				main_canals[1] = 1;
+			else if(nb_ref_colors[second]<nb_ref_colors[i]) {
+				second = i;
 			}
 		}
+		if(nb_ref_colors[first]!=0) main_colors.add(this.refColor[first]);
+		if(nb_ref_colors[second]!=0) main_colors.add(this.refColor[second]);
+		return main_colors;
+	}
+	
+	public int[] countRefColors(ImageReader img_reader, PixelReader pix_reader) throws IOException {
+		int w = img_reader.getWidth(0);
+		int h = img_reader.getHeight(0);
+		int[] nb_ref_colors = new int[this.refColor.length];
+		for(int i=2 ; i<w*h; i++){
+			Color pix_img_col = this.getPixelColor(pix_reader.getColor(i/w,i%9));
+			for(int j=0; j<this.refColor.length; j++) {
+				if(this.refColor[j].equals(pix_img_col)) {nb_ref_colors[j]++;}
+			}
+		}
+		return nb_ref_colors;
+	}
+	
+	public Color getPixelColor(Color img_col){
+		int[] img_main_channel = this.priorityChannel(img_col);
+		Color col_selected = null;
+		double[] dist_img_selected = null;
+		for(int i=1; i<this.refColor.length; i++){
+			Color ref_color = this.refColor[i];
+			int[] ref_main_channel = this.priorityChannel(ref_color);
+			if(col_selected==null && this.samePriorityChannel(img_main_channel, ref_main_channel)) {
+				col_selected = ref_color;
+				dist_img_selected = this.getDistanceColors(img_col, col_selected, img_main_channel);
+			}
+			else if(this.samePriorityChannel(img_main_channel, ref_main_channel)) {
+					double[] dist_ref_img = this.getDistanceColors(img_col, ref_color, img_main_channel);
+					col_selected = this.betterColor(dist_img_selected, dist_ref_img, col_selected, ref_color);
+					if(col_selected.equals(ref_color)) dist_img_selected = dist_ref_img;
+			}
+		}
+		return col_selected;
+	}
+	
+	public int[] priorityChannel(Color color) {
+		double r = color.getRed();
+		double g = color.getGreen();
+		double b = color.getBlue();
+		int[] main_canals = {0,0,0};
+		double min = Math.min(Math.min(r, g), b);
+		double max = Math.max(Math.max(r, g), b);
+		double precision = 50.0/255.0;
+		if(max-min<=precision) {
+			return main_canals;
+		}
+		if(r==max) {
+			if(r-g>precision) 
+				main_canals[1] = 1;
+			if(r-b>precision)
+				main_canals[2] = 1;
+		}
+		else if(g==max) {
+			if(g-r>precision)
+				main_canals[0] = 1;
+			if(g-b>precision)
+				main_canals[2] = 1;
+		}
+		else {
+			if(b-r>precision)
+				main_canals[0] = 1;
+			if(b-g>precision)
+				main_canals[1] = 1;
+		}
 		return main_canals;
+	}
+
+	
+	public boolean samePriorityChannel(int[] main_c1, int[] main_c2) {
+		return main_c1[0]==main_c2[0] && main_c1[1]==main_c2[1] && main_c1[2]==main_c2[2];
+	}
+	
+	public Color betterColor(double[] dist, double[] dist2, Color col, Color col2) {
+		if(dist[0]<=dist2[0] && dist[1]<=dist2[1] && dist[2]<=dist2[2])
+			return col;
+		return col2;
+	}
+	
+	public double[] getDistanceColors(Color img_color, Color color, int[] priority){
+		double[] distance = {0,0,0};
+		if(priority[0]==0)
+			distance[0] = Math.abs(img_color.getRed()-color.getRed());
+		if(priority[1]==0)
+			distance[1] = Math.abs(img_color.getGreen()-color.getGreen());
+		if(priority[2]==0)
+			distance[2] = Math.abs(img_color.getBlue()-color.getBlue());
+		return distance;
 	}
 }
