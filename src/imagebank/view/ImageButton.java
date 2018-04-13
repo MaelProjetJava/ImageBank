@@ -1,24 +1,28 @@
 package imagebank.view;
 
+import javafx.scene.control.Button;
 import javafx.scene.image.*;
 import java.io.File;
 import java.net.MalformedURLException;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
+public class ImageButton extends Button {
 
-public class ControlButton extends Button {
-
-	public ControlButton(File f) {
+	//String nom;
+	//File chemin;
+	
+	public ImageButton(String s, File f) {
 		super();
+		//this.nom=s;
+		//this.chemin=f;
+		
+		/*this.setMaxWidth(150);
+		this.setMaxHeight(150);
+		this.setText(s);
 		try {
-			this.setMaxWidth(100);
 			this.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),50,50,true,true)));
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 	
 }

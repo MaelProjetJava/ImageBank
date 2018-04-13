@@ -1,5 +1,8 @@
 package imagebank;
 
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
 import javax.imageio.stream.ImageInputStream;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -16,7 +19,7 @@ import imagebank.view.ControlView;
 import imagebank.view.ListImageView;
 import imagebank.view.MainView;
 
-public class Controller {
+public class Controller{
 
 		Scene scene0,scene1,scene2,scene3;
 		
@@ -31,13 +34,6 @@ public class Controller {
 			ListImageView flow = new ListImageView();
 			border.setLeft(flow);
 			
-			ImageView pages[] = new ImageView[8];
-		    for (int i=0; i<8; i++) {
-		    	Image x = new Image("file:///D:/Funky_Creep/workspace/ProjetJava/images/image"+i+".jpg",150,150,true,true);
-		        pages[i] = new ImageView(x);
-		        flow.getChildren().add(pages[i]);
-		    }
-		    
 		    //   ---BOTTOM---
 		    ControlView control = new ControlView();
 		    border.setBottom(control);
@@ -60,7 +56,6 @@ public class Controller {
 		    });
 		    
 		    border.setCenter(main);
-		    
 			scene0 = new Scene(border, 1800,1000);
 
 			//Scene1
@@ -89,7 +84,6 @@ public class Controller {
 			});
 
 			border2.setCenter(main2);
-
 			scene1 = new Scene(border2, 1800,1000);
 			
 			//Scene2
@@ -100,12 +94,6 @@ public class Controller {
 			ListImageView flow4 = new ListImageView();
 			border3.setLeft(flow4);
 
-			ImageView pages2[] = new ImageView[8];
-			for (int i=0; i<8; i++) {
-				Image x = new Image("file:///D:/Funky_Creep/workspace/ProjetJava/images/image"+i+".jpg",150,150,true,true);
-				pages2[i] = new ImageView(x);
-				flow4.getChildren().add(pages2[i]);
-			}
 			//   ---BOTTOM---
 			ControlView control3 = new ControlView();
 			border3.setBottom(control3);
@@ -127,7 +115,6 @@ public class Controller {
 			});
 
 			border3.setCenter(main3);
-
 			scene2 = new Scene(border3, 1800,1000);
 
 			//Scene3
@@ -155,10 +142,10 @@ public class Controller {
 			});
 
 			border4.setCenter(main4);
-
 			scene3 = new Scene(border4, 1800,1000);
 
 			primaryStage.setScene(scene0);
 			primaryStage.show();
 	}
+
 }
