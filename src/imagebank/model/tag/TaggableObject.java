@@ -3,7 +3,7 @@ package imagebank.model.tag;
 import java.io.Serializable;
 import java.util.LinkedHashSet;
 
-public abstract class TaggableObject implements Taggable, Serializable {
+public abstract class TaggableObject implements Serializable {
 
 	private LinkedHashSet<Tag> tagSet;
 
@@ -11,18 +11,15 @@ public abstract class TaggableObject implements Taggable, Serializable {
 		tagSet = new LinkedHashSet<>();
 	}
 
-	@Override
-	protected boolean addTag(Tag tag) {
+	final boolean addTag(Tag tag) {
 		return tagSet.add(tag);
 	}
 
-	@Override
-	protected boolean remove(Tag tag) {
+	final boolean remove(Tag tag) {
 		return tagSet.remove(tag);
 	}
 
-	@Override
-	public boolean hasTag(Tag tag) {
+	final public boolean hasTag(Tag tag) {
 		if (tagSet.contains(tag))
 			return true;
 
@@ -34,8 +31,7 @@ public abstract class TaggableObject implements Taggable, Serializable {
 		return false;
 	}
 
-	@Override
-	public Iterable<Tag> getTags() {
+	final public Iterable<Tag> getTags() {
 		return tagSet;
 	}
 }
