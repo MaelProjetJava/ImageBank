@@ -1,6 +1,6 @@
 package imagebank;
 
-import javafx.stage.Stage:
+import javafx.stage.Stage;
 
 public class Controller {
 

@@ -1,11 +1,10 @@
 package imagebank.model;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javafx.scene.image.PixelReader;
 import javafx.scene.paint.Color;
-
-import java.util.ArrayList;
 
 import javax.imageio.ImageReader;
 
@@ -15,32 +14,36 @@ public class DominantColor {
 			Color.rgb(75,230,230),Color.rgb(52,103,152),Color.rgb(20,20,230),Color.rgb(152,52,103),
 			Color.rgb(230,75,230),Color.rgb(223,223,233),Color.rgb(160,160,160),Color.rgb(96,96,96),
 			Color.rgb(32,32,32)};
-	protected String[] name_colors = {"Red", "Brown", "Yellow", "Green","Cyan", "DarkCyan", "Blue",
+	private final String[] name_colors = {"Red", "Brown", "Yellow", "Green","Cyan", "DarkCyan", "Blue",
 			"DarkMagenta", "Magenta", "White", "LighGray", "Gray", "DarkGray", "Black"};
-	public ArrayList<Color> d_colors;
+	private ArrayList<Color> d_colors;
+	private String[] nameDominantColor;
 
 	public DominantColor() {
-		
+		this.d_colors = new ArrayList<Color>();
+		this.nameDominantColor = new String[2];
 	}	
 	
-	public ArrayList<Color> getDominantColor(ImageReader img_reader, PixelReader pix_reader) throws IOException {
+	public ArrayList<Color> getDominantColor(ImageReader img_reader, PixelReader pix_reader)
+	throws IOException {
 		int[] nb_ref_colors = this.countRefColors(img_reader, pix_reader);
 		this.d_colors = this.mainColors(nb_ref_colors); 
 		return this.d_colors; 
 	}
 
 	public String[] getNameDominantColor(){
-		String[] name_color = {"", ""};
-		for(int i=0; i<this.refColor.length; i++){
-			if(this.refColor[i].equals(this.d_colors.get(0)))
-				name_color[0] = this.name_colors[i];
-			if(this.refColor[i].equals(this.d_colors.get(1)))
-				name_color[1] = this.name_colors[i];
-		}
-		return name_color;
+		return this.nameDominantColor;
 	}
 
-	public ArrayList<Color> mainColors(int[] nb_ref_colors){
+	public String[] getAllNameColors(){
+		return this.name_colors;
+	}
+
+	public Color[] getAllColors(){
+		return this.refColor;
+	}
+
+	private ArrayList<Color> mainColors(int[] nb_ref_colors){
 		ArrayList<Color> main_colors = new ArrayList<Color>();
 		int first = 0;
 		int second = 1;
@@ -54,45 +57,54 @@ public class DominantColor {
 				second = i;
 			}
 		}
-		if(nb_ref_colors[first]!=0) main_colors.add(this.refColor[first]);
-		if(nb_ref_colors[second]!=0) main_colors.add(this.refColor[second]);
+		if(nb_ref_colors[first]!=0){
+			main_colors.add(this.refColor[first]);
+			this.nameDominantColor[0] = this.name_colors[first];
+		}
+		if(nb_ref_colors[second]!=0){
+			main_colors.add(this.refColor[second]);
+			this.nameDominantColor[1] = this.name_colors[second];
+		}
 		return main_colors;
 	}
 	
-	public int[] countRefColors(ImageReader img_reader, PixelReader pix_reader) throws IOException {
+	private int[] countRefColors(ImageReader img_reader, PixelReader pix_reader) throws IOException {
 		int w = img_reader.getWidth(0);
 		int h = img_reader.getHeight(0);
 		int[] nb_ref_colors = new int[this.refColor.length];
-		for(int i=2 ; i<w*h; i++){
-			Color pix_img_col = this.getPixelColor(pix_reader.getColor(i/w,i%9));
-			for(int j=0; j<this.refColor.length; j++) {
-				if(this.refColor[j].equals(pix_img_col)) {nb_ref_colors[j]++;}
+		for(int i=0 ; i<w; i++){
+			for(int j=0; j<h; j++) {
+				Color pix_img_col = this.getPixelColor(pix_reader.getColor(i,j));
+				this.updateNbRefColor(nb_ref_colors, pix_img_col);
 			}
+			
 		}
 		return nb_ref_colors;
 	}
 	
-	public Color getPixelColor(Color img_col){
+	private void updateNbRefColor(int[] nb_ref_colors, Color pix_img_col) {
+		for(int i=0; i<this.refColor.length; i++) {
+			if(this.refColor[i].equals(pix_img_col)) {nb_ref_colors[i]++;}
+		}
+	}
+	
+	private Color getPixelColor(Color img_col){
 		int[] img_main_channel = this.priorityChannel(img_col);
-		Color col_selected = null;
-		double[] dist_img_selected = null;
-		for(int i=1; i<this.refColor.length; i++){
+		Color col_selected = this.refColor[0];
+		double[] dist_img_selected = this.getDistanceColors(img_col, col_selected, this.priorityChannel(col_selected));
+		for(int i=0; i<this.refColor.length; i++){
 			Color ref_color = this.refColor[i];
 			int[] ref_main_channel = this.priorityChannel(ref_color);
-			if(col_selected==null && this.samePriorityChannel(img_main_channel, ref_main_channel)) {
-				col_selected = ref_color;
-				dist_img_selected = this.getDistanceColors(img_col, col_selected, img_main_channel);
-			}
-			else if(this.samePriorityChannel(img_main_channel, ref_main_channel)) {
-					double[] dist_ref_img = this.getDistanceColors(img_col, ref_color, img_main_channel);
-					col_selected = this.betterColor(dist_img_selected, dist_ref_img, col_selected, ref_color);
-					if(col_selected.equals(ref_color)) dist_img_selected = dist_ref_img;
+			if(this.samePriorityChannel(img_main_channel, ref_main_channel)) {
+				double[] dist_ref_img = this.getDistanceColors(img_col, ref_color, img_main_channel);
+				col_selected = this.betterColor(dist_img_selected, dist_ref_img, col_selected, ref_color);
+				if(col_selected.equals(ref_color)) dist_img_selected = dist_ref_img;
 			}
 		}
 		return col_selected;
 	}
 	
-	public int[] priorityChannel(Color color) {
+	private int[] priorityChannel(Color color) {
 		double r = color.getRed();
 		double g = color.getGreen();
 		double b = color.getBlue();
@@ -125,17 +137,17 @@ public class DominantColor {
 	}
 
 	
-	public boolean samePriorityChannel(int[] main_c1, int[] main_c2) {
+	private boolean samePriorityChannel(int[] main_c1, int[] main_c2) {
 		return main_c1[0]==main_c2[0] && main_c1[1]==main_c2[1] && main_c1[2]==main_c2[2];
 	}
 	
-	public Color betterColor(double[] dist, double[] dist2, Color col, Color col2) {
+	private Color betterColor(double[] dist, double[] dist2, Color col, Color col2) {
 		if(dist[0]<=dist2[0] && dist[1]<=dist2[1] && dist[2]<=dist2[2])
 			return col;
 		return col2;
 	}
 	
-	public double[] getDistanceColors(Color img_color, Color color, int[] priority){
+	private double[] getDistanceColors(Color img_color, Color color, int[] priority){
 		double[] distance = {0,0,0};
 		if(priority[0]==0)
 			distance[0] = Math.abs(img_color.getRed()-color.getRed());
