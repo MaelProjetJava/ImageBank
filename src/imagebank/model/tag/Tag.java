@@ -3,16 +3,14 @@ package imagebank.model.tag;
 public class Tag extends TaggableObject {
 
 	private String name;
-	private boolean hasValue;
-	private long value;
+	private Long value;
 	private Tag unvaluedTagVersion;
 	private AVLTree<String,Image> taggedImages;
 
 	protected Tag(String name) {
 		super();
 		this.name = name;
-		this.value = 0;
-		this.hasValue = false;
+		this.value = null;
 		this.unvaluedTagVersion = this;
 	}
 
@@ -20,7 +18,6 @@ public class Tag extends TaggableObject {
 		super();
 		this.name = name;
 		this.value = value;
-		this.hasValue = true;
 		this.unvaluedTagVersion = new Tag(name);
 	}
 
@@ -44,7 +41,7 @@ public class Tag extends TaggableObject {
 	}
 
 	public boolean hasValue() {
-		return hasValue;
+		return value != null;
 	}
 
 	@Override
