@@ -15,7 +15,7 @@ public abstract class TaggableObject implements Serializable {
 		return tagSet.add(tag);
 	}
 
-	final boolean remove(Tag tag) {
+	final boolean removeTag(Tag tag) {
 		return tagSet.remove(tag);
 	}
 
