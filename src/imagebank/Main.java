@@ -23,9 +23,7 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-//<<<<<<< HEAD
 		controller.start(primaryStage);
-//=======
 		//controller.start(primaryStage);
 		primaryStage.setTitle("Test exception de l'image");
 		StackPane root = new StackPane();
@@ -42,7 +40,6 @@ public class Main extends Application {
 		Scene scene  = new Scene(root, 500, 500);
 		primaryStage.setScene(scene);
 		primaryStage.show();
-//>>>>>>> origin/carlos
 	}
 
 	public static void main(String args[]) {
