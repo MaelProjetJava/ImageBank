@@ -34,7 +34,7 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		RIGHT
 	}
 
-	private static class PathStep<T> {
+	public static class PathStep<T> {
 		private T node;
 		private Direction direction;
 
@@ -592,7 +592,7 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 		return comparableKey;
 	}
 
-	private static <K,V> Node<K,V> getNodeFromPath(Node<K,V> root,
+	public static <K,V> Node<K,V> getNodeFromPath(Node<K,V> root,
 					Deque<PathStep<Node<K,V>>> path) {
 
 		if (path.peekFirst() != null)
