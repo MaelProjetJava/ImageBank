@@ -2,6 +2,7 @@ package imagebank;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import javafx.stage.Stage;
 
 import javax.imageio.stream.ImageInputStream;
 import javafx.application.Application;
