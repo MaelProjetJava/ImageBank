@@ -1,6 +1,9 @@
 package imagebank.model.tag;
 
 import java.util.LinkedHashMap;
+import java.io.Serializable;
+
+import imagebank.model.Image;
 
 public class Tagger implements Serializable {
 
@@ -12,7 +15,7 @@ public class Tagger implements Serializable {
 		tags = new LinkedHashMap<>();
 	}
 
-	public Tagger getInstance() {
+	public static Tagger getInstance() {
 		if (instance == null)
 			instance = new Tagger();
 
@@ -45,6 +48,6 @@ public class Tagger implements Serializable {
 	}
 
 	public static Iterable<Tag> getAllTags() {
-		return tags.values();
+		return getInstance().tags.values();
 	}
 }

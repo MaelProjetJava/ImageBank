@@ -19,7 +19,7 @@ public abstract class TaggableObject implements Serializable {
 		return tagSet.remove(tag);
 	}
 
-	final public boolean hasTag(Tag tag) {
+	public final boolean hasTag(Tag tag) {
 		if (tagSet.contains(tag))
 			return true;
 
