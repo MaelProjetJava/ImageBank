@@ -53,7 +53,7 @@ public class Tag extends TaggableObject {
 		return foundNode != null ? foundNode.getValue() : null;
 	}
 
-	protected Node<Long,Tag> addValuedTag(Tag valuedTag)
+	protected Tag addValuedTag(Tag valuedTag)
 						throws UnvaluedTagException {
 		if (!hasValue() || !valuedTag.hasValue())
 			throw new UnvaluedTagException();
@@ -62,10 +62,10 @@ public class Tag extends TaggableObject {
 		Deque<PathStep<Node<Long,Tag>>> insertPath
 					= buildPath(valuesTreeRoot, newNode);
 
-		return insert(insertPath, newNode);
+		return insert(insertPath, newNode).getValue();
 	}
 
-	protected Node<Long,Tag> removeValuedTag(Tag valuedTag)
+	protected Tag removeValuedTag(Tag valuedTag)
 						throws UnvaluedTagException {
 		if (!hasValue() || !valuedTag.hasValue())
 			throw new UnvaluedTagException();
@@ -74,7 +74,7 @@ public class Tag extends TaggableObject {
 				= buildPath(valuesTreeRoot,
 					valuedTag.valuesTreeRoot.getKey());
 
-		return delete(deletePath, valuesTreeRoot);
+		return delete(deletePath, valuesTreeRoot).getValue();
 	}
 
 	protected void addTaggedImage(Image image) {
