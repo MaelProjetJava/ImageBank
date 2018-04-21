@@ -1,6 +1,8 @@
 package imagebank.model.tag;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.NoSuchElementException;
 import java.io.Serializable;
 
 import imagebank.model.Image;
@@ -53,6 +55,27 @@ public class Tagger implements Serializable {
 		getInstance().tags.put(name, rootTag);
 
 		return tag;
+	}
+
+	public static Iterable<Tag> getTags(String name, long start, long end)
+						throws UnvaluedTagException {
+		Tag tag = getInstance().tags.get(name);
+
+		if (tag == null) {
+			return () -> new Iterator<Tag>() {
+				@Override
+				public boolean hasNext() {
+					return false;
+				}
+
+				@Override
+				public Tag next() {
+					throw new NoSuchElementException();
+				}
+			};
+		} else {
+			return tag.getValuedTags(start, end);
+		}
 	}
 
 	public static void tag(Image image, Tag tag) {

@@ -1,6 +1,8 @@
 package imagebank.model.tag;
 
 import java.util.Deque;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import imagebank.util.AVLTree;
 import static imagebank.util.AVLTree.*;
@@ -75,6 +77,41 @@ public class Tag extends TaggableObject {
 					valuedTag.valuesTreeRoot.getKey());
 
 		return delete(deletePath, valuesTreeRoot).getValue();
+	}
+
+	protected Iterable<Tag> getValuedTags(long start, long end)
+						throws UnvaluedTagException {
+		if (!hasValue())
+			throw new UnvaluedTagException();
+
+		return () -> new Iterator<Tag>() {
+			private Deque<PathStep<Node<Long,Tag>>> currentPath =
+					firstBounded(valuesTreeRoot,
+							Long.valueOf(start));
+
+			@Override
+			public boolean hasNext() {
+				return currentPath != null && getNodeFromPath(
+					valuesTreeRoot, currentPath).getKey()
+							< end;
+			}
+
+			@Override
+			public Tag next() {
+				if (currentPath == null)
+					throw new NoSuchElementException();
+
+				Node<Long,Tag> node = getNodeFromPath(
+						valuesTreeRoot, currentPath);
+
+				if (node.getKey() >= end)
+					throw new NoSuchElementException();
+
+				currentPath = successor(valuesTreeRoot,
+								currentPath);
+				return node.getValue();
+			}
+		};
 	}
 
 	protected void addTaggedImage(Image image) {
