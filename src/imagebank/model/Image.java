@@ -31,8 +31,11 @@ public class Image {//extends TaggableObject {
 		this.fx_img = new javafx.scene.image.Image("file:/"+url);
 		this.img_file = new File(url);
 		this.dc = new DominantColor();
-		
 		this.metadata();
+	}
+	
+	public String getName() {
+		return this.img_file.getName();
 	}
 	
 	public javafx.scene.image.Image getFxImage() {
@@ -43,7 +46,7 @@ public class Image {//extends TaggableObject {
 		//Tagger.tag(this, Tagger.getTag("Note", note));
 	}
 	
-	public void tagImageTag(String val){
+	public void tagImage(String val){
 		//Tagger.tag(this, Tagger.getTag(val));
 	}
 	
@@ -63,7 +66,7 @@ public class Image {//extends TaggableObject {
 			this.tagImageFormat(img_reader);
 			this.tagImagePath();
 			this.tagImageOwner();
-			System.out.println(this.img_file.getName()+" "+pix_reader);
+			this.tagImageDomColor(img_reader, pix_reader);
 			iis.close();
 		}
 		catch(IOException ioe) {
@@ -111,8 +114,8 @@ public class Image {//extends TaggableObject {
 		this.dominant_color = this.dc.getDominantColor(img_reader,
 								pix_reader);
 		this.name_colors = this.dc.getNameDominantColor();
+		System.out.println(this.dominant_color+"\n");
 		/*Tagger.tag(this, Tagger.getTag(this.name_colors[0]);
 		Tagger.tag(this, Tagger.getTag(this.name_colors[1]);*/
 	}
-
 }

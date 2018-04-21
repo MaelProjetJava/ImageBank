@@ -22,17 +22,30 @@ public class ImageFile {
 		return this.img_file;
 	}
 	
+	public void addImage(String path, ArrayList<Image> list_img) {
+		File newImg = new File(path);
+		if(newImg.exists() && this.isImageFile(newImg)) {
+			this.updateListImage(path);
+		}
+		
+	}
+	
+	private void updateListImage(String path_file) {
+		Image img = null;
+		if(this.isWinOS())
+			img = new Image(this.toWinPath(path_file));
+		else
+			img = new Image(path_file);
+		this.img_file.add(img);
+	}
+	
 	private void listImages() {
 		String[] files = this.directory.list();
-		Image img = null;
 		for(int i=0; i<files.length; i++) {
-			if(!this.isImageFile(new File(this.abs_directory_path+"/"+files[i])))
+			String file_abs_path = this.abs_directory_path+"/"+files[i];
+			if(!this.isImageFile(new File(file_abs_path)))
 				continue;
-			if(this.isWinOS())
-				img = new Image(this.toWinPath(this.abs_directory_path)+"/"+files[i]);
-			else
-				img = new Image(this.abs_directory_path+"/"+files[i]);
-			this.img_file.add(img);
+			this.updateListImage(file_abs_path);
 		}
 	}
 	

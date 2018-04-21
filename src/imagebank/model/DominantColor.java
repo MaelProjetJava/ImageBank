@@ -77,7 +77,6 @@ public class DominantColor {
 				Color pix_img_col = this.getPixelColor(pix_reader.getColor(i,j));
 				this.updateNbRefColor(nb_ref_colors, pix_img_col);
 			}
-			
 		}
 		return nb_ref_colors;
 	}
