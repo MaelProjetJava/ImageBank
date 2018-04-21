@@ -78,20 +78,56 @@ public class Tagger implements Serializable {
 		}
 	}
 
-	public static void tag(Image image, Tag tag) {
+	private static void addImageToTag(Image image, Tag tag) {
+		tag.addTaggedImage(image);
 
+		for (Tag parentTag : tag.getTags())
+			addImageToTag(image, parentTag);
+	}
+
+	public static void tag(Image image, Tag tag) {
+		/* If the Image is already tagged by the Tag*/
+		if (!((TaggableObject) image).addTag(tag))
+			return;
+
+		addImageToTag(image, tag);
 	}
 
 	public static void tag(Tag tagged, Tag tagger) {
+		/* If the Tag is already tagged by the Tag */
+		if (!tagged.addTag(tagger))
+			return;
 
+		for (Image image : tagged.getTaggedImages())
+			addImageToTag(image, tagger);
+	}
+
+	private static void removeImageFromTag(Image image, Tag tag) {
+		tag.removeTaggedImage(image);
+
+		for (Tag parentTag : tag.getTags()) {
+			if (!image.hasTag(parentTag))
+				removeImageFromTag(image, parentTag);
+		}
 	}
 
 	public static void untag(Image image, Tag tag) {
+		/* If the Image is not actually tagged by the Tag */
+		if (!((TaggableObject) image).removeTag(tag))
+			return;
 
+		removeImageFromTag(image, tag);
 	}
 
 	public static void untag(Tag tagged, Tag tagger) {
+		/* If the Tag is not actually tagger by the Tag */
+		if (!tagged.removeTag(tagger))
+			return;
 
+		for (Image image : tagged.getTaggedImages()) {
+			if (!image.hasTag(tagger))
+				removeImageFromTag(image, tagger);
+		}
 	}
 
 	public static Iterable<Tag> getAllTags() {
