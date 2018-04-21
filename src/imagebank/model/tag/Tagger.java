@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.NoSuchElementException;
 import java.io.Serializable;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
 import imagebank.model.Image;
 
@@ -15,6 +17,12 @@ public class Tagger implements Serializable {
 
 	private Tagger() {
 		tags = new LinkedHashMap<>();
+	}
+
+	private void readObject(ObjectInputStream stream)
+				throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		instance = this;
 	}
 
 	public static Tagger getInstance() {

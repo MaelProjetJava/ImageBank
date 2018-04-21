@@ -469,7 +469,7 @@ public class AVLTree<K,V> extends AbstractMap<K,V>
 	private Node<ComparableKey<K>,V> root;
 	private Comparator<? super K> userComparator;
 	private int size = 0;
-	private Set<Map.Entry<K,V>> entrySet = null;
+	private transient Set<Map.Entry<K,V>> entrySet = null;
 
 	public AVLTree() {
 		root = null;
