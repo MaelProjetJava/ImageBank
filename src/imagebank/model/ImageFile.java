@@ -1,12 +1,14 @@
 package imagebank.model;
 
+import imagebank.util.AVLTree;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList; 
 
 public class ImageFile {
-	private ArrayList<Image> img_file;
+	private AVLTree<String, Image> images;
 	private String abs_directory_path;
 	private File directory;
 	
@@ -14,12 +16,12 @@ public class ImageFile {
 		this.directory = new File(directory_path);
 		if(!directory.isDirectory()) throw new NotDirectoryException();
 		this.abs_directory_path = directory.getAbsolutePath();
-		this.img_file = new ArrayList<Image>();
+		this.images = new AVLTree<String, Image>();
 	}
 	
-	public ArrayList<Image> getImagesFile() {
+	public AVLTree<String, Image> getImagesFile() {
 		this.listImages();
-		return this.img_file;
+		return this.images;
 	}
 	
 	public void addImage(String path, ArrayList<Image> list_img) {
@@ -36,7 +38,7 @@ public class ImageFile {
 			img = new Image(this.toWinPath(path_file));
 		else
 			img = new Image(path_file);
-		this.img_file.add(img);
+		this.images.put(img.getName(), img);
 	}
 	
 	private void listImages() {
