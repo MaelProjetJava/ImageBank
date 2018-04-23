@@ -57,8 +57,8 @@ public class ImageFile {
 		try {
 			FileReader file_reader = new FileReader(img_file);
 			char[] buffer = new char[4];
-			char[] jpg = {'ÿ', 'Ø', 'ÿ'};
-			char[] png = {'‰', 'P', 'N', 'G'};
+			char[] jpg = {0xff, 0xd8, 0xff};
+			char[] png = {0x89, 'P', 'N', 'G'};
 			file_reader.read(buffer);
 			for(int i=0; i<buffer.length; i++) {
 				if(png[i]!=buffer[i])
