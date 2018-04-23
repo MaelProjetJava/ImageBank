@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.nio.file.Files;
 
 
-public class Image {//extends TaggableObject {	
+public class Image extends TaggableObject {
 	private File img_file; 
 	private DominantColor dc;
 	private javafx.scene.image.Image fx_img;
