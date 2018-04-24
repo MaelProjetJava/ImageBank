@@ -10,6 +10,7 @@ public class ImageDB {
 	private File savedDB;
 	private ImageFile images;
 	private ArrayList<Image> selectedImages;
+	private int currentImageIndex;
 	private ArrayList<ImageDBListener> listeners;
 
 	public ImageDB(File imagesDirectory) throws IOException {
@@ -21,6 +22,7 @@ public class ImageDB {
 					.collect(Collectors
 						.toCollection(ArrayList::new));
 
+		currentImageIndex = 0;
 		listeners = new ArrayList<>();
 	}
 
@@ -62,5 +64,29 @@ public class ImageDB {
 
 		for (ImageDBListener listener : listeners)
 			listener.imageDBChanged(event);
+	}
+
+	public Iterable<Image> getSelectedImageList() {
+		return selectedImages;
+	}
+
+	public Image getCurrentImage() {
+		if (selectedImages.size() == 0)
+			return null;
+		else
+			return selectedImages.get(currentImageIndex);
+	}
+
+	public void showNextImage() {
+		currentImageIndex = (currentImageIndex + 1)
+						% selectedImages.size();
+		notifyChanges();
+	}
+
+	public void showPreviousImage() {
+		currentImageIndex--;
+		if (currentImageIndex < 0)
+			currentImageIndex = selectedImages.size() - 1;
+		notifyChanges();
 	}
 }
