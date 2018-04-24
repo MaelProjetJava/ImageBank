@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.io.*;
 import imagebank.model.tag.Tagger;
+import imagebank.model.tag.TaggerListener;
+import imagebank.model.tag.TaggerEvent;
 
-public class ImageDB {
+public class ImageDB implements TaggerListener {
 
 	private File savedDB;
 	private ImageFile images;
@@ -24,6 +26,7 @@ public class ImageDB {
 
 		currentImageIndex = 0;
 		listeners = new ArrayList<>();
+		Tagger.getInstance().addTaggerListener(this);
 	}
 
 	private final void restoreTagger() throws IOException {
@@ -64,6 +67,11 @@ public class ImageDB {
 
 		for (ImageDBListener listener : listeners)
 			listener.imageDBChanged(event);
+	}
+
+	@Override
+	public void tagsChanged(TaggerEvent event) {
+		notifyChanges();
 	}
 
 	public Iterable<Image> getSelectedImageList() {

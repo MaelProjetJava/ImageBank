@@ -2,6 +2,7 @@ package imagebank.model.tag;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.io.Serializable;
 import java.io.IOException;
@@ -14,6 +15,7 @@ public class Tagger implements Serializable {
 	private static Tagger instance = null;
 
 	private LinkedHashMap<String,Tag> tags;
+	private ArrayList<TaggerListener> listeners;
 
 	private Tagger() {
 		tags = new LinkedHashMap<>();
@@ -23,6 +25,25 @@ public class Tagger implements Serializable {
 				throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
 		instance = this;
+	}
+
+	public void addTaggerListener(TaggerListener listener)
+						throws NullPointerException {
+		if (listener == null)
+			throw new NullPointerException();
+
+		listeners.add(listener);
+	}
+
+	public void removeTaggerListener(TaggerListener listener) {
+		listeners.remove(listener);
+	}
+
+	private void notifyChanges() {
+		TaggerEvent event = new TaggerEvent(this);
+
+		for (TaggerListener listener : listeners)
+			listener.tagsChanged(event);
 	}
 
 	public static Tagger getInstance() {
@@ -99,6 +120,7 @@ public class Tagger implements Serializable {
 			return;
 
 		addImageToTag(image, tag);
+		getInstance().notifyChanges();
 	}
 
 	public static void tag(Tag tagged, Tag tagger) {
@@ -108,6 +130,8 @@ public class Tagger implements Serializable {
 
 		for (Image image : tagged.getTaggedImages())
 			addImageToTag(image, tagger);
+
+		getInstance().notifyChanges();
 	}
 
 	private static void removeImageFromTag(Image image, Tag tag) {
@@ -125,6 +149,7 @@ public class Tagger implements Serializable {
 			return;
 
 		removeImageFromTag(image, tag);
+		getInstance().notifyChanges();
 	}
 
 	public static void untag(Tag tagged, Tag tagger) {
@@ -136,6 +161,8 @@ public class Tagger implements Serializable {
 			if (!image.hasTag(tagger))
 				removeImageFromTag(image, tagger);
 		}
+
+		getInstance().notifyChanges();
 	}
 
 	public static Iterable<Tag> getAllTags() {
