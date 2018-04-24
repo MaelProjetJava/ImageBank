@@ -5,9 +5,10 @@ import imagebank.util.AVLTree;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList; 
 
-public class ImageFile {
+public class ImageFile implements Serializable {
 	private AVLTree<String, Image> images;
 	private String abs_directory_path;
 	private File directory;

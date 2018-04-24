@@ -6,6 +6,7 @@ import imagebank.model.tag.TaggableObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -22,18 +23,26 @@ import java.nio.file.Files;
 
 public class Image extends TaggableObject {
 	private File img_file; 
+	private String url;
 	private DominantColor dc;
-	private javafx.scene.image.Image fx_img;
+	private transient javafx.scene.image.Image fx_img;
 	protected ArrayList<Color> dominant_color;
 	protected String[] name_colors;
 	
 	public Image(String url) {
+		this.url = url;
 		this.fx_img = new javafx.scene.image.Image("file:/"+url);
 		this.img_file = new File(url);
 		this.dc = new DominantColor();
 		this.metadata();
 	}
-	
+
+	private void readObject(ObjectInputStream stream)
+				throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		this.fx_img = new javafx.scene.image.Image("file:/" + url);
+	}
+
 	public String getName() {
 		return this.img_file.getName();
 	}
