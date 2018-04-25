@@ -1,6 +1,8 @@
 package imagebank.view;
 import java.io.File;
 
+import imagebank.model.ImageFile;
+import imagebank.model.NotDirectoryException;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -19,11 +21,12 @@ public class ListImageView extends TilePane {
 		//this.setAlignment(Pos.CENTER);
 		this.setStyle("-fx-background-color: DAE6F3;");
 		
-		ImageView pages[] = new ImageView[8];
+		
+		/*ImageView pages[] = new ImageView[8];
 	    for (int i=0; i<8; i++) {
 	    	//ImageButton i = new ImageButton("left",new File("/D:/Funky_Creep/workspace/ProjetJava/images/left.png"));
 	    	
-	    	Image x = new Image("file:///D:/Funky_Creep/workspace/ProjetJava/images/image"+i+".jpg",150,150,true,true);
+	    	Image x = new Image("file:///D:/Funky_Creep/workspace/ProjetJava/images/liste_images/image"+i+".jpg",150,150,true,true);
 	        pages[i] = new ImageView(x);
 	        pages[i].setImage(x);
 	        pages[i].setPreserveRatio(true);
@@ -36,9 +39,8 @@ public class ListImageView extends TilePane {
 	        //pages[i].setFitWidth(150);
 	        //pages[i].setFitHeight(150);
 	        //Rectangle2D square = new Rectangle2D(50,50,150,150);
-	        //pages[i].setViewport(square);*/
+	        //pages[i].setViewport(square);
 	        this.getChildren().add(pages[i]);
-	    }
+	    }*/
 	}
-
 }

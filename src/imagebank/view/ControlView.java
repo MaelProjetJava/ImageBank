@@ -7,8 +7,8 @@ import javafx.scene.layout.HBox;
 
 public class ControlView extends HBox {
 
-	ControlButton previous = new ControlButton(new File("/D:/Funky_Creep/workspace/ProjetJava/images/previous.png"));
-    ControlButton next = new ControlButton(new File("/D:/Funky_Creep/workspace/ProjetJava/images/next.png"));
+	ControlButton previous = new ControlButton(new File("/D:/Funky_Creep/workspace/ImageBank/images/previous.png"));
+    ControlButton next = new ControlButton(new File("/D:/Funky_Creep/workspace/ImageBank/images/next.png"));
 	
 	public ControlView() {
 		super();
