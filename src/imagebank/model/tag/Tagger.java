@@ -19,6 +19,7 @@ public class Tagger implements Serializable {
 
 	private Tagger() {
 		tags = new LinkedHashMap<>();
+		listeners = new ArrayList<>();
 	}
 
 	private void readObject(ObjectInputStream stream)
