@@ -1,7 +1,9 @@
 package imagebank.model;
 
-public class NotDirectoryException extends Exception {
+import java.io.FileNotFoundException;
+
+public class NotDirectoryException extends FileNotFoundException {
 	public NotDirectoryException() {
-		super("Directory not found");
+		super("This is not a directory");
 	}
 }

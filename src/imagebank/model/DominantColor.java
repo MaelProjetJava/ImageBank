@@ -1,6 +1,9 @@
 package imagebank.model;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import javafx.scene.image.PixelReader;
@@ -8,21 +11,48 @@ import javafx.scene.paint.Color;
 
 import javax.imageio.ImageReader;
 
-public class DominantColor {
-	private final Color[] refColor = {
+public class DominantColor implements Serializable {
+	private static final Color[] refColor = {
 			Color.rgb(230,20,20),Color.rgb(152,103,52),Color.rgb(230,230,75),Color.rgb(20,230,20),
 			Color.rgb(75,230,230),Color.rgb(52,103,152),Color.rgb(20,20,230),Color.rgb(152,52,103),
 			Color.rgb(230,75,230),Color.rgb(223,223,233),Color.rgb(160,160,160),Color.rgb(96,96,96),
 			Color.rgb(32,32,32)};
-	private final String[] name_colors = {"Red", "Brown", "Yellow", "Green","Cyan", "DarkCyan", "Blue",
-			"DarkMagenta", "Magenta", "White", "LighGray", "Gray", "DarkGray", "Black"};
-	private ArrayList<Color> d_colors;
+	private static final String[] name_colors = {"Red", "Brown", "Yellow", "Green","Cyan", "DarkCyan", "Blue",
+			"DarkMagenta", "Magenta", "White", "LightGray", "Gray", "DarkGray", "Black"};
+	private transient ArrayList<Color> d_colors;
 	private String[] nameDominantColor;
 
 	public DominantColor() {
 		this.d_colors = new ArrayList<Color>();
 		this.nameDominantColor = new String[2];
 	}	
+
+	private void readObject(ObjectInputStream stream)
+				throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		d_colors = new ArrayList<>();
+
+		int colorCount = stream.readInt();
+		for (int i = 0; i < colorCount; i++) {
+			double red = stream.readDouble();
+			double green = stream.readDouble();
+			double blue = stream.readDouble();
+			double opacity = stream.readDouble();
+			d_colors.add(new Color(red, green, blue, opacity));
+		}
+	}
+
+	private void writeObject(ObjectOutputStream stream) throws IOException {
+		stream.defaultWriteObject();
+		stream.writeInt(d_colors.size());
+
+		for (Color color : d_colors) {
+			stream.writeDouble(color.getRed());
+			stream.writeDouble(color.getGreen());
+			stream.writeDouble(color.getBlue());
+			stream.writeDouble(color.getOpacity());
+		}
+	}
 	
 	public ArrayList<Color> getDominantColor(ImageReader img_reader, PixelReader pix_reader)
 	throws IOException {
@@ -77,7 +107,6 @@ public class DominantColor {
 				Color pix_img_col = this.getPixelColor(pix_reader.getColor(i,j));
 				this.updateNbRefColor(nb_ref_colors, pix_img_col);
 			}
-			
 		}
 		return nb_ref_colors;
 	}

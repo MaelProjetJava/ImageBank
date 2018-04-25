@@ -6,6 +6,7 @@ import imagebank.model.tag.TaggableObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -20,19 +21,30 @@ import java.util.ArrayList;
 import java.nio.file.Files;
 
 
-public class Image {//extends TaggableObject {	
+public class Image extends TaggableObject {
 	private File img_file; 
+	private String url;
 	private DominantColor dc;
-	private javafx.scene.image.Image fx_img;
+	private transient javafx.scene.image.Image fx_img;
 	protected ArrayList<Color> dominant_color;
 	protected String[] name_colors;
 	
 	public Image(String url) {
+		this.url = url;
 		this.fx_img = new javafx.scene.image.Image("file:/"+url);
 		this.img_file = new File(url);
 		this.dc = new DominantColor();
-		
 		this.metadata();
+	}
+
+	private void readObject(ObjectInputStream stream)
+				throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		this.fx_img = new javafx.scene.image.Image("file:/" + url);
+	}
+
+	public String getName() {
+		return this.img_file.getName();
 	}
 	
 	public javafx.scene.image.Image getFxImage() {
@@ -43,7 +55,7 @@ public class Image {//extends TaggableObject {
 		//Tagger.tag(this, Tagger.getTag("Note", note));
 	}
 	
-	public void tagImageTag(String val){
+	public void tagImage(String val){
 		//Tagger.tag(this, Tagger.getTag(val));
 	}
 	
@@ -63,7 +75,7 @@ public class Image {//extends TaggableObject {
 			this.tagImageFormat(img_reader);
 			this.tagImagePath();
 			this.tagImageOwner();
-			System.out.println(this.img_file.getName()+" "+pix_reader);
+			this.tagImageDomColor(img_reader, pix_reader);
 			iis.close();
 		}
 		catch(IOException ioe) {
@@ -111,8 +123,8 @@ public class Image {//extends TaggableObject {
 		this.dominant_color = this.dc.getDominantColor(img_reader,
 								pix_reader);
 		this.name_colors = this.dc.getNameDominantColor();
+		System.out.println(this.dominant_color+"\n");
 		/*Tagger.tag(this, Tagger.getTag(this.name_colors[0]);
 		Tagger.tag(this, Tagger.getTag(this.name_colors[1]);*/
 	}
-
 }
