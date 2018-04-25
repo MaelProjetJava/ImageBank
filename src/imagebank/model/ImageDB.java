@@ -74,7 +74,7 @@ public class ImageDB implements TaggerListener {
 		notifyChanges();
 	}
 
-	public Iterable<Image> getSelectedImageList() {
+	public Iterable<Image> getSelectedImagesList() {
 		return selectedImages;
 	}
 
