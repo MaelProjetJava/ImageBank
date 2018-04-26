@@ -71,7 +71,7 @@ public class ImageFile implements Serializable {
 			file_reader.close();
 		}
 		catch(IOException ioe) {
-			System.err.println(ioe.getMessage());
+			return false;
 		}
 		return is_png || is_jpg;
 	}
