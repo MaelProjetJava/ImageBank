@@ -2,6 +2,7 @@ package imagebank.view;
 
 import java.io.File;
 
+import imagebank.model.Image;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -9,6 +10,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.image.ImageView;
 
 public class MainView extends BorderPane {
 
@@ -29,5 +31,9 @@ public class MainView extends BorderPane {
 	    //this.setCenter(value);
 	}
 	
-	
+	public void displayImage(Image i) {
+		ImageView iv = new ImageView();
+		iv.setImage(i.getFxImage());
+		this.getChildren().add(iv);
+	}
 }

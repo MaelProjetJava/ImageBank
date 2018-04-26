@@ -1,6 +1,10 @@
 package imagebank;
 
 import javafx.stage.Stage;
+
+import java.io.File;
+import java.io.IOException;
+
 import javax.imageio.stream.ImageInputStream;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -13,137 +17,74 @@ import javafx.scene.text.*;
 import javafx.event.*;
 import javafx.scene.image.*;
 import javafx.scene.shape.*;
+import imagebank.model.ImageDB;
 import imagebank.view.ControlView;
 import imagebank.view.ListImageView;
 import imagebank.view.MainView;
 
-public class Controller{
+public class Controller {
 
-		Scene scene0,scene1,scene2,scene3;
+		Scene scene;
+		MainView current;
+		ImageDB imageDB;
+		
+		public Controller() {
+			try {
+				imageDB = new ImageDB(new File("/D:/Funky_Creep/workspace/ImageBank/images/liste_images"));
+			} catch (IOException e) {
+				System.out.println("Erreur");
+				e.printStackTrace();
+			}
+		}
 		
 	    public void start(final Stage primaryStage) {
 			
 			primaryStage.setTitle("Projet Java Galerie Photos");
 			
-			//Scene0
+			MainView main = new MainView();
 			BorderPane border = new BorderPane();
 			
-			//   ---LEFT---
-			ListImageView flow = new ListImageView();
+			ListImageView flow = new ListImageView(imageDB,main);
 			border.setLeft(flow);
 			
-		    //   ---BOTTOM---
 		    ControlView control = new ControlView();
 		    border.setBottom(control);
 		    
-		    //   ---RIGHT---
-			ListImageView flow2 = new ListImageView();
-			border.setRight(flow2);
+			//ListImageView flow2 = new ListImageView(imageDB);
+			//border.setRight(flow2);
 		    
-		    //   ---CENTER---
-		    MainView main = new MainView();
+		    //MainView main = new MainView();
 		    main.left.setOnAction(new EventHandler<ActionEvent>() {
 		    	@Override public void handle (ActionEvent e) {
-		    		primaryStage.setScene(scene1);
+		    		if (flow.isManaged()) {
+		    			//flow.setVisible(false);
+		    			flow.setManaged(false);
+		    		}
+		    		else {
+		    			//flow.setVisible(true);
+		    			flow.setManaged(true);
+		    		}
 		    	}
 		    });
-		    main.right.setOnAction(new EventHandler<ActionEvent>() {
+		    /*main.right.setOnAction(new EventHandler<ActionEvent>() {
 		    	@Override public void handle (ActionEvent e) {
-		    		primaryStage.setScene(scene2);
+		    		if (flow2.isManaged()) {
+		    			//flow2.setVisible(false);
+		    			flow2.setManaged(false);
+		    		}
+		    		else {
+		    			//flow2.setVisible(true);
+		    			flow2.setManaged(true);
+		    		}
 		    	}
-		    });
+		    });*/
 		    
 		    border.setCenter(main);
-			scene0 = new Scene(border, 1800,1000);
+			scene = new Scene(border, 1800,1000);
 
-			//Scene1
-			BorderPane border2 = new BorderPane();
-			
-			//   ---BOTTOM---
-			ControlView control2 = new ControlView();
-			border2.setBottom(control2);
-
-			//   ---RIGHT---
-			ListImageView flow3 = new ListImageView();
-			border2.setRight(flow3);
-
-			//   ---CENTER---
-			MainView main2 = new MainView();
-			main2.left.setOnAction(new EventHandler<ActionEvent>() {
-				@Override public void handle (ActionEvent e) {
-					primaryStage.setScene(scene0);
-				}
-			});
-
-			main2.right.setOnAction(new EventHandler<ActionEvent>() {
-				@Override public void handle (ActionEvent e) {
-					primaryStage.setScene(scene3);
-				}
-			});
-
-			border2.setCenter(main2);
-			scene1 = new Scene(border2, 1800,1000);
-			
-			//Scene2
-
-			BorderPane border3 = new BorderPane();
-
-			//   ---LEFT---
-			ListImageView flow4 = new ListImageView();
-			border3.setLeft(flow4);
-
-			//   ---BOTTOM---
-			ControlView control3 = new ControlView();
-			border3.setBottom(control3);
-
-
-			//   ---CENTER---
-			MainView main3 = new MainView();
-
-			main3.left.setOnAction(new EventHandler<ActionEvent>() {
-				@Override public void handle (ActionEvent e) {
-					primaryStage.setScene(scene3);
-				}
-			});
-
-			main3.right.setOnAction(new EventHandler<ActionEvent>() {
-				@Override public void handle (ActionEvent e) {
-					primaryStage.setScene(scene0);
-				}
-			});
-
-			border3.setCenter(main3);
-			scene2 = new Scene(border3, 1800,1000);
-
-			//Scene3
-
-			BorderPane border4 = new BorderPane();
-
-			//   ---BOTTOM---
-			ControlView control4 = new ControlView();
-			border4.setBottom(control4);
-
-
-			//   ---CENTER---
-			MainView main4 = new MainView();
-
-			main4.left.setOnAction(new EventHandler<ActionEvent>() {
-				@Override public void handle (ActionEvent e) {
-					primaryStage.setScene(scene2);
-				}
-			});
-
-			main4.right.setOnAction(new EventHandler<ActionEvent>() {
-				@Override public void handle (ActionEvent e) {
-					primaryStage.setScene(scene1);
-				}
-			});
-
-			border4.setCenter(main4);
-			scene3 = new Scene(border4, 1800,1000);
-
-			primaryStage.setScene(scene0);
+			primaryStage.setScene(scene);
 			primaryStage.show();
+			
 	}
 
 }
