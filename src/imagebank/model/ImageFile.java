@@ -3,7 +3,7 @@ package imagebank.model;
 import imagebank.util.AVLTree;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList; 
@@ -56,16 +56,18 @@ public class ImageFile implements Serializable {
 		boolean is_png = true;
 		boolean is_jpg = true;
 		try {
-			FileReader file_reader = new FileReader(img_file);
-			char[] buffer = new char[4];
-			char[] jpg = {0xff, 0xd8, 0xff};
-			char[] png = {0x89, 'P', 'N', 'G'};
+			FileInputStream file_reader =
+						new FileInputStream(img_file);
+			byte[] buffer = new byte[4];
+			byte[] jpg = {(byte) 0xff, (byte) 0xd8, (byte) 0xff};
+			byte[] png = {(byte) 0x89, (byte) 0x50, (byte) 0x4e,
+								(byte) 0x47};
 			file_reader.read(buffer);
 			for(int i=0; i<buffer.length; i++) {
 				if(png[i]!=buffer[i])
 					is_png = false;
-				if(i<jpg.length)
-					is_jpg = (jpg[i]!=buffer[i]) ? false : true;
+				if(i < jpg.length && jpg[i] != buffer[i])
+					is_jpg = false;
 			}
 			
 			file_reader.close();
