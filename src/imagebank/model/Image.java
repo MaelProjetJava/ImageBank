@@ -19,20 +19,22 @@ import java.util.Iterator;
 import java.util.ArrayList;
 
 import java.nio.file.Files;
+import java.net.MalformedURLException;
 
 
 public class Image extends TaggableObject {
 	private File img_file; 
-	private String url;
 	private DominantColor dc;
 	private transient javafx.scene.image.Image fx_img;
 	protected ArrayList<Color> dominant_color;
 	protected String[] name_colors;
 	
-	public Image(String url) {
-		this.url = url;
-		this.fx_img = new javafx.scene.image.Image("file:/"+url);
-		this.img_file = new File(url);
+	public Image(File imagePath) throws MalformedURLException {
+		this.img_file = imagePath;
+		this.fx_img = new javafx.scene.image.Image(
+			img_file.toURI().toURL().toString(),
+			false
+		);
 		this.dc = new DominantColor();
 		this.metadata();
 	}
@@ -40,7 +42,10 @@ public class Image extends TaggableObject {
 	private void readObject(ObjectInputStream stream)
 				throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
-		this.fx_img = new javafx.scene.image.Image("file:/" + url);
+		this.fx_img = new javafx.scene.image.Image(
+			img_file.toURI().toURL().toString(),
+			false
+		);
 	}
 
 	public String getName() {

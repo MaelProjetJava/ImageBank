@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList; 
+import java.net.MalformedURLException;
 
 public class ImageFile implements Serializable {
 	private AVLTree<String, Image> images;
@@ -28,27 +29,30 @@ public class ImageFile implements Serializable {
 	public void addImage(String path, ArrayList<Image> list_img) {
 		File newImg = new File(path);
 		if(newImg.exists() && this.isImageFile(newImg)) {
-			this.updateListImage(path);
+			this.updateListImage(newImg);
 		}
 		
 	}
 	
-	private void updateListImage(String path_file) {
-		Image img = null;
-		if(this.isWinOS())
-			img = new Image(this.toWinPath(path_file));
-		else
-			img = new Image(path_file);
-		this.images.put(img.getName(), img);
+	private void updateListImage(File imagePath) {
+		try {
+			Image img = new Image(imagePath);
+			this.images.put(img.getName(), img);
+		} catch (MalformedURLException e) {
+			/**
+			 * L'URL est créé à partir d'une URI, elle même créé
+			 * à partir dun File: l'URL devrait donc toujours être
+			 * bien formée.
+			 */
+		}
 	}
 	
 	private void listImages() {
-		String[] files = this.directory.list();
+		File[] files = this.directory.listFiles();
 		for(int i=0; i<files.length; i++) {
-			String file_abs_path = this.abs_directory_path+"/"+files[i];
-			if(!this.isImageFile(new File(file_abs_path)))
+			if(!this.isImageFile(files[i]))
 				continue;
-			this.updateListImage(file_abs_path);
+			this.updateListImage(files[i]);
 		}
 	}
 	
