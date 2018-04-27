@@ -1,6 +1,8 @@
 package imagebank.model;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Collections;
 import java.util.stream.Collectors;
 import java.io.*;
 import imagebank.model.tag.Tagger;
@@ -78,8 +80,8 @@ public class ImageDB implements TaggerListener {
 		notifyChanges();
 	}
 
-	public Iterable<Image> getSelectedImagesList() {
-		return selectedImages;
+	public List<Image> getSelectedImages() {
+		return Collections.unmodifiableList(selectedImages);
 	}
 
 	public Image getCurrentImage() {
@@ -87,6 +89,15 @@ public class ImageDB implements TaggerListener {
 			return null;
 		else
 			return selectedImages.get(currentImageIndex);
+	}
+
+	public void setCurrentImage(int index) {
+		if (index < 0 || index >= selectedImages.size()) {
+			throw new IndexOutOfBoundsException(
+							String.valueOf(index));
+		}
+
+		currentImageIndex = index;
 	}
 
 	public void showNextImage() {
