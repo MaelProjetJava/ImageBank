@@ -17,9 +17,8 @@ public class ImageDB implements TaggerListener {
 
 	public ImageDB(File imagesDirectory) throws IOException {
 		savedDB = new File(imagesDirectory, "imagedb.dat");
-		restoreTagger();
+		restoreDB();
 
-		images = new ImageFile(imagesDirectory.getAbsolutePath());
 		selectedImages = images.getImagesFile().values().stream()
 					.collect(Collectors
 						.toCollection(ArrayList::new));
@@ -29,14 +28,18 @@ public class ImageDB implements TaggerListener {
 		Tagger.getInstance().addTaggerListener(this);
 	}
 
-	private final void restoreTagger() throws IOException {
-		if (!savedDB.exists() || !savedDB.isFile())
+	private final void restoreDB() throws IOException {
+		if (!savedDB.exists() || !savedDB.isFile()) {
+			images = new ImageFile(
+				savedDB.getParentFile().getAbsolutePath());
 			return;
+		}
 
 		try (FileInputStream fis = new FileInputStream(savedDB);
 			ObjectInputStream stream = new ObjectInputStream(fis)
 		) {
 			Tagger tagger = (Tagger) stream.readObject();
+			images = (ImageFile) stream.readObject();
 		} catch (ClassNotFoundException e) {
 			throw new IOException(e);
 		}
@@ -46,6 +49,7 @@ public class ImageDB implements TaggerListener {
 		FileOutputStream fos = new FileOutputStream(savedDB);
 		ObjectOutputStream stream = new ObjectOutputStream(fos);
 		stream.writeObject(Tagger.getInstance());
+		stream.writeObject(images);
 		stream.close();
 	}
 

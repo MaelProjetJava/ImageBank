@@ -37,7 +37,7 @@ public class ImageFile implements Serializable {
 	private void updateListImage(File imagePath) {
 		try {
 			Image img = new Image(imagePath);
-			this.images.put(img.getName(), img);
+			this.images.putIfAbsent(img.getName(), img);
 		} catch (MalformedURLException e) {
 			/**
 			 * L'URL est créé à partir d'une URI, elle même créé

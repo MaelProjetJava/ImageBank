@@ -7,6 +7,7 @@ import imagebank.model.tag.TaggableObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -26,7 +27,7 @@ public class Image extends TaggableObject {
 	private File img_file; 
 	private DominantColor dc;
 	private transient javafx.scene.image.Image fx_img;
-	protected ArrayList<Color> dominant_color;
+	protected transient ArrayList<Color> dominant_color;
 	protected String[] name_colors;
 	
 	public Image(File imagePath) throws MalformedURLException {
@@ -42,10 +43,16 @@ public class Image extends TaggableObject {
 	private void readObject(ObjectInputStream stream)
 				throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
+		dominant_color = DominantColor.deserializeColorArray(stream);
 		this.fx_img = new javafx.scene.image.Image(
 			img_file.toURI().toURL().toString(),
 			false
 		);
+	}
+
+	private void writeObject(ObjectOutputStream stream) throws IOException {
+		stream.defaultWriteObject();
+		DominantColor.serializeColorArray(stream, dominant_color);
 	}
 
 	public String getName() {

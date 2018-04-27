@@ -15,7 +15,7 @@ public class Tagger implements Serializable {
 	private static Tagger instance = null;
 
 	private LinkedHashMap<String,Tag> tags;
-	private ArrayList<TaggerListener> listeners;
+	private transient ArrayList<TaggerListener> listeners;
 
 	private Tagger() {
 		tags = new LinkedHashMap<>();
@@ -26,6 +26,7 @@ public class Tagger implements Serializable {
 				throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
 		instance = this;
+		listeners = new ArrayList<>();
 	}
 
 	public void addTaggerListener(TaggerListener listener)
