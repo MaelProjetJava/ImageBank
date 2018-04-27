@@ -8,6 +8,7 @@ import java.io.*;
 import imagebank.model.tag.Tagger;
 import imagebank.model.tag.TaggerListener;
 import imagebank.model.tag.TaggerEvent;
+import imagebank.model.tag.Tag;
 
 public class ImageDB implements TaggerListener {
 
@@ -117,5 +118,20 @@ public class ImageDB implements TaggerListener {
 		if (currentImageIndex < 0)
 			currentImageIndex = selectedImages.size() - 1;
 		notifyChanges();
+	}
+
+	private boolean filter(Image image, Tag criteria[]) {
+		for (Tag tag : criteria) {
+			if (!image.hasTag(tag))
+				return false;
+		}
+
+		return true;
+	}
+
+	public void search(Tag criteria[]) {
+		selectedImages = images.getImagesFile().values().stream()
+			.filter(i -> filter(i, criteria))
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 }
