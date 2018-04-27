@@ -64,11 +64,11 @@ public class Image extends TaggableObject {
 	}
 	
 	public void tagImageNote(int note) {
-		//Tagger.tag(this, Tagger.getTag("Note", note));
+		Tagger.tag(this, Tagger.getTag("Note", note));
 	}
 	
 	public void tagImage(String val){
-		//Tagger.tag(this, Tagger.getTag(val));
+		Tagger.tag(this, Tagger.getTag(val));
 	}
 	
 	public ArrayList<Color> getDominantColor(){
@@ -98,36 +98,36 @@ public class Image extends TaggableObject {
 	private void tagImageSize() throws IOException {
 		long size = Files.size(this.img_file.toPath());
 		System.out.println(size/1024+"Ko");
-		//Tagger.tag(this, Tagger.getTag("Size", size));
+		Tagger.tag(this, Tagger.getTag("Size", size));
 	}
 	
 	private void tagImageDimensions(ImageReader img_reader) throws IOException {
 		int width = img_reader.getWidth(0);
 		int height = img_reader.getHeight(0);
 		System.out.println(width+"x"+height);
-		/*Tagger.tag(this, Tagger.getTag("Width", width));
-		Tagger.tag(this, Tagger.getTag("Height", height));*/
+		Tagger.tag(this, Tagger.getTag("Width", width));
+		Tagger.tag(this, Tagger.getTag("Height", height));
 	}
 	
 	private void tagImageFormat(ImageReader img_reader) throws IOException {
 		String format = img_reader.getFormatName();
 		System.out.println(format);
-		/*Tagger.tag(this, Tagger.getTag("Format"));
-		Tagger.tag(Tagger.getTag("Format"), Tagger.getTag(format));*/
+		Tagger.tag(this, Tagger.getTag(format));
+		Tagger.tag(Tagger.getTag(format), Tagger.getTag("Format"));
 	}
 	
 	private void tagImagePath() {
 		String abs_path = this.img_file.getAbsolutePath();
 		System.out.println(abs_path);
-		/*Tagger.tag(this, Tagger.getTag("Path"));
-		Tagger.tag(Tagger.getTag("Path"), Tagger.getTag(abs_path));*/
+		Tagger.tag(this, Tagger.getTag(abs_path));
+		Tagger.tag(Tagger.getTag(abs_path), Tagger.getTag("Path"));
 	}
 	
 	private void tagImageOwner() throws IOException {
 		String owner = Files.getOwner(this.img_file.toPath()).getName();
 		System.out.println(owner);
-		/*Tagger.tag(this, Tagger.getTag("Owner"));
-		Tagger.tag(Tagger.getTag("Owner"), Tagger.getTag(owner));*/
+		Tagger.tag(this, Tagger.getTag(owner));
+		Tagger.tag(Tagger.getTag(owner), Tagger.getTag("Owner"));
 	}
 	
 	private void tagImageDomColor(ImageReader img_reader, PixelReader pix_reader)
@@ -136,7 +136,7 @@ public class Image extends TaggableObject {
 								pix_reader);
 		this.name_colors = this.dc.getNameDominantColor();
 		System.out.println(this.dominant_color+"\n");
-		/*Tagger.tag(this, Tagger.getTag(this.name_colors[0]);
-		Tagger.tag(this, Tagger.getTag(this.name_colors[1]);*/
+		Tagger.tag(this, Tagger.getTag(this.name_colors[0]));
+		Tagger.tag(this, Tagger.getTag(this.name_colors[1]));
 	}
 }
