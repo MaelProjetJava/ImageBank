@@ -90,12 +90,18 @@ public class ImageDB implements TaggerListener {
 	}
 
 	public void showNextImage() {
+		if (selectedImages.size() == 0)
+			return;
+
 		currentImageIndex = (currentImageIndex + 1)
 						% selectedImages.size();
 		notifyChanges();
 	}
 
 	public void showPreviousImage() {
+		if (selectedImages.size() == 0)
+			return;
+
 		currentImageIndex--;
 		if (currentImageIndex < 0)
 			currentImageIndex = selectedImages.size() - 1;
