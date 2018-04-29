@@ -27,10 +27,9 @@ public class DominantColor implements Serializable {
 		this.nameDominantColor = new String[2];
 	}	
 
-	private void readObject(ObjectInputStream stream)
-				throws IOException, ClassNotFoundException {
-		stream.defaultReadObject();
-		d_colors = new ArrayList<>();
+	static ArrayList<Color> deserializeColorArray(ObjectInputStream stream)
+							throws IOException {
+		ArrayList<Color> colorArray = new ArrayList<>();
 
 		int colorCount = stream.readInt();
 		for (int i = 0; i < colorCount; i++) {
@@ -38,20 +37,32 @@ public class DominantColor implements Serializable {
 			double green = stream.readDouble();
 			double blue = stream.readDouble();
 			double opacity = stream.readDouble();
-			d_colors.add(new Color(red, green, blue, opacity));
+			colorArray.add(new Color(red, green, blue, opacity));
 		}
+
+		return colorArray;
+	}
+	private void readObject(ObjectInputStream stream)
+				throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		d_colors = deserializeColorArray(stream);
 	}
 
-	private void writeObject(ObjectOutputStream stream) throws IOException {
-		stream.defaultWriteObject();
-		stream.writeInt(d_colors.size());
+	static void serializeColorArray(ObjectOutputStream stream,
+				ArrayList<Color> colors) throws IOException {
+		stream.writeInt(colors.size());
 
-		for (Color color : d_colors) {
+		for (Color color : colors) {
 			stream.writeDouble(color.getRed());
 			stream.writeDouble(color.getGreen());
 			stream.writeDouble(color.getBlue());
 			stream.writeDouble(color.getOpacity());
 		}
+	}
+
+	private void writeObject(ObjectOutputStream stream) throws IOException {
+		stream.defaultWriteObject();
+		serializeColorArray(stream, d_colors);
 	}
 	
 	public ArrayList<Color> getDominantColor(ImageReader img_reader, PixelReader pix_reader)

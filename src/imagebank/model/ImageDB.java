@@ -1,11 +1,14 @@
 package imagebank.model;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Collections;
 import java.util.stream.Collectors;
 import java.io.*;
 import imagebank.model.tag.Tagger;
 import imagebank.model.tag.TaggerListener;
 import imagebank.model.tag.TaggerEvent;
+import imagebank.model.tag.Tag;
 
 public class ImageDB implements TaggerListener {
 
@@ -17,9 +20,8 @@ public class ImageDB implements TaggerListener {
 
 	public ImageDB(File imagesDirectory) throws IOException {
 		savedDB = new File(imagesDirectory, "imagedb.dat");
-		restoreTagger();
+		restoreDB();
 
-		images = new ImageFile(imagesDirectory.getAbsolutePath());
 		selectedImages = images.getImagesFile().values().stream()
 					.collect(Collectors
 						.toCollection(ArrayList::new));
@@ -29,14 +31,18 @@ public class ImageDB implements TaggerListener {
 		Tagger.getInstance().addTaggerListener(this);
 	}
 
-	private final void restoreTagger() throws IOException {
-		if (!savedDB.exists() || !savedDB.isFile())
+	private final void restoreDB() throws IOException {
+		if (!savedDB.exists() || !savedDB.isFile()) {
+			images = new ImageFile(
+				savedDB.getParentFile().getAbsolutePath());
 			return;
+		}
 
 		try (FileInputStream fis = new FileInputStream(savedDB);
 			ObjectInputStream stream = new ObjectInputStream(fis)
 		) {
 			Tagger tagger = (Tagger) stream.readObject();
+			images = (ImageFile) stream.readObject();
 		} catch (ClassNotFoundException e) {
 			throw new IOException(e);
 		}
@@ -46,6 +52,7 @@ public class ImageDB implements TaggerListener {
 		FileOutputStream fos = new FileOutputStream(savedDB);
 		ObjectOutputStream stream = new ObjectOutputStream(fos);
 		stream.writeObject(Tagger.getInstance());
+		stream.writeObject(images);
 		stream.close();
 	}
 
@@ -74,8 +81,8 @@ public class ImageDB implements TaggerListener {
 		notifyChanges();
 	}
 
-	public Iterable<Image> getSelectedImageList() {
-		return selectedImages;
+	public List<Image> getSelectedImages() {
+		return Collections.unmodifiableList(selectedImages);
 	}
 
 	public Image getCurrentImage() {
@@ -85,16 +92,46 @@ public class ImageDB implements TaggerListener {
 			return selectedImages.get(currentImageIndex);
 	}
 
+	public void setCurrentImage(int index) {
+		if (index < 0 || index >= selectedImages.size()) {
+			throw new IndexOutOfBoundsException(
+							String.valueOf(index));
+		}
+
+		currentImageIndex = index;
+	}
+
 	public void showNextImage() {
+		if (selectedImages.size() == 0)
+			return;
+
 		currentImageIndex = (currentImageIndex + 1)
 						% selectedImages.size();
 		notifyChanges();
 	}
 
 	public void showPreviousImage() {
+		if (selectedImages.size() == 0)
+			return;
+
 		currentImageIndex--;
 		if (currentImageIndex < 0)
 			currentImageIndex = selectedImages.size() - 1;
 		notifyChanges();
+	}
+
+	private boolean filter(Image image, Tag criteria[]) {
+		for (Tag tag : criteria) {
+			if (!image.hasTag(tag))
+				return false;
+		}
+
+		return true;
+	}
+
+	public void search(Tag criteria[]) {
+		selectedImages = images.getImagesFile().values().stream()
+			.filter(i -> filter(i, criteria))
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 }

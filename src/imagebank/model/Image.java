@@ -7,6 +7,7 @@ import imagebank.model.tag.TaggableObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -19,20 +20,22 @@ import java.util.Iterator;
 import java.util.ArrayList;
 
 import java.nio.file.Files;
+import java.net.MalformedURLException;
 
 
 public class Image extends TaggableObject {
 	private File img_file; 
-	private String url;
 	private DominantColor dc;
 	private transient javafx.scene.image.Image fx_img;
-	protected ArrayList<Color> dominant_color;
+	protected transient ArrayList<Color> dominant_color;
 	protected String[] name_colors;
 	
-	public Image(String url) {
-		this.url = url;
-		this.fx_img = new javafx.scene.image.Image("file:/"+url);
-		this.img_file = new File(url);
+	public Image(File imagePath) throws MalformedURLException {
+		this.img_file = imagePath;
+		this.fx_img = new javafx.scene.image.Image(
+			img_file.toURI().toURL().toString(),
+			false
+		);
 		this.dc = new DominantColor();
 		this.metadata();
 	}
@@ -40,7 +43,16 @@ public class Image extends TaggableObject {
 	private void readObject(ObjectInputStream stream)
 				throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
-		this.fx_img = new javafx.scene.image.Image("file:/" + url);
+		dominant_color = DominantColor.deserializeColorArray(stream);
+		this.fx_img = new javafx.scene.image.Image(
+			img_file.toURI().toURL().toString(),
+			false
+		);
+	}
+
+	private void writeObject(ObjectOutputStream stream) throws IOException {
+		stream.defaultWriteObject();
+		DominantColor.serializeColorArray(stream, dominant_color);
 	}
 
 	public String getName() {
@@ -52,11 +64,11 @@ public class Image extends TaggableObject {
 	}
 	
 	public void tagImageNote(int note) {
-		//Tagger.tag(this, Tagger.getTag("Note", note));
+		Tagger.tag(this, Tagger.getTag("Note", note));
 	}
 	
 	public void tagImage(String val){
-		//Tagger.tag(this, Tagger.getTag(val));
+		Tagger.tag(this, Tagger.getTag(val));
 	}
 	
 	public ArrayList<Color> getDominantColor(){
@@ -86,36 +98,36 @@ public class Image extends TaggableObject {
 	private void tagImageSize() throws IOException {
 		long size = Files.size(this.img_file.toPath());
 		System.out.println(size/1024+"Ko");
-		//Tagger.tag(this, Tagger.getTag("Size", size));
+		Tagger.tag(this, Tagger.getTag("Size", size));
 	}
 	
 	private void tagImageDimensions(ImageReader img_reader) throws IOException {
 		int width = img_reader.getWidth(0);
 		int height = img_reader.getHeight(0);
 		System.out.println(width+"x"+height);
-		/*Tagger.tag(this, Tagger.getTag("Width", width));
-		Tagger.tag(this, Tagger.getTag("Height", height));*/
+		Tagger.tag(this, Tagger.getTag("Width", width));
+		Tagger.tag(this, Tagger.getTag("Height", height));
 	}
 	
 	private void tagImageFormat(ImageReader img_reader) throws IOException {
 		String format = img_reader.getFormatName();
 		System.out.println(format);
-		/*Tagger.tag(this, Tagger.getTag("Format"));
-		Tagger.tag(Tagger.getTag("Format"), Tagger.getTag(format));*/
+		Tagger.tag(this, Tagger.getTag(format));
+		Tagger.tag(Tagger.getTag(format), Tagger.getTag("Format"));
 	}
 	
 	private void tagImagePath() {
 		String abs_path = this.img_file.getAbsolutePath();
 		System.out.println(abs_path);
-		/*Tagger.tag(this, Tagger.getTag("Path"));
-		Tagger.tag(Tagger.getTag("Path"), Tagger.getTag(abs_path));*/
+		Tagger.tag(this, Tagger.getTag(abs_path));
+		Tagger.tag(Tagger.getTag(abs_path), Tagger.getTag("Path"));
 	}
 	
 	private void tagImageOwner() throws IOException {
 		String owner = Files.getOwner(this.img_file.toPath()).getName();
 		System.out.println(owner);
-		/*Tagger.tag(this, Tagger.getTag("Owner"));
-		Tagger.tag(Tagger.getTag("Owner"), Tagger.getTag(owner));*/
+		Tagger.tag(this, Tagger.getTag(owner));
+		Tagger.tag(Tagger.getTag(owner), Tagger.getTag("Owner"));
 	}
 	
 	private void tagImageDomColor(ImageReader img_reader, PixelReader pix_reader)
@@ -124,7 +136,7 @@ public class Image extends TaggableObject {
 								pix_reader);
 		this.name_colors = this.dc.getNameDominantColor();
 		System.out.println(this.dominant_color+"\n");
-		/*Tagger.tag(this, Tagger.getTag(this.name_colors[0]);
-		Tagger.tag(this, Tagger.getTag(this.name_colors[1]);*/
+		Tagger.tag(this, Tagger.getTag(this.name_colors[0]));
+		Tagger.tag(this, Tagger.getTag(this.name_colors[1]));
 	}
 }

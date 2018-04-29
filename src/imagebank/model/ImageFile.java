@@ -3,10 +3,11 @@ package imagebank.model;
 import imagebank.util.AVLTree;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList; 
+import java.net.MalformedURLException;
 
 public class ImageFile implements Serializable {
 	private AVLTree<String, Image> images;
@@ -28,27 +29,32 @@ public class ImageFile implements Serializable {
 	public void addImage(String path, ArrayList<Image> list_img) {
 		File newImg = new File(path);
 		if(newImg.exists() && this.isImageFile(newImg)) {
-			this.updateListImage(path);
+			this.updateListImage(newImg);
 		}
 		
 	}
 	
-	private void updateListImage(String path_file) {
-		Image img = null;
-		if(this.isWinOS())
-			img = new Image(this.toWinPath(path_file));
-		else
-			img = new Image(path_file);
-		this.images.put(img.getName(), img);
+	private void updateListImage(File imagePath) {
+		try {
+			if (!images.containsKey(imagePath.getName())) {
+				Image img = new Image(imagePath);
+				this.images.put(img.getName(), img);
+			}
+		} catch (MalformedURLException e) {
+			/**
+			 * L'URL est créé à partir d'une URI, elle même créé
+			 * à partir dun File: l'URL devrait donc toujours être
+			 * bien formée.
+			 */
+		}
 	}
 	
 	private void listImages() {
-		String[] files = this.directory.list();
+		File[] files = this.directory.listFiles();
 		for(int i=0; i<files.length; i++) {
-			String file_abs_path = this.abs_directory_path+"/"+files[i];
-			if(!this.isImageFile(new File(file_abs_path)))
+			if(!this.isImageFile(files[i]))
 				continue;
-			this.updateListImage(file_abs_path);
+			this.updateListImage(files[i]);
 		}
 	}
 	
@@ -56,16 +62,18 @@ public class ImageFile implements Serializable {
 		boolean is_png = true;
 		boolean is_jpg = true;
 		try {
-			FileReader file_reader = new FileReader(img_file);
-			char[] buffer = new char[4];
-			char[] jpg = {0xff, 0xd8, 0xff};
-			char[] png = {0x89, 'P', 'N', 'G'};
+			FileInputStream file_reader =
+						new FileInputStream(img_file);
+			byte[] buffer = new byte[4];
+			byte[] jpg = {(byte) 0xff, (byte) 0xd8, (byte) 0xff};
+			byte[] png = {(byte) 0x89, (byte) 0x50, (byte) 0x4e,
+								(byte) 0x47};
 			file_reader.read(buffer);
 			for(int i=0; i<buffer.length; i++) {
 				if(png[i]!=buffer[i])
 					is_png = false;
-				if(i<jpg.length)
-					is_jpg = (jpg[i]!=buffer[i]) ? false : true;
+				if(i < jpg.length && jpg[i] != buffer[i])
+					is_jpg = false;
 			}
 			
 			file_reader.close();
