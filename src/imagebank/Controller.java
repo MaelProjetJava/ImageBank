@@ -44,20 +44,34 @@ public class Controller {
 			
 			BorderPane root = new BorderPane();
 			
+			//LEFT
 			ListImageView flow = new ListImageView(imageDB);
 			imageDB.addImageDBListener(flow);
 			root.setLeft(flow);
 			
-			MainView main = new MainView();
+			//CENTER
+			MainView main = new MainView(imageDB);
 			imageDB.addImageDBListener(main);
 			
 			main.left.setOnAction(new EventHandler<ActionEvent>() {
 		    	@Override public void handle (ActionEvent e) {
 		    		if (flow.isManaged()) {
 		    			flow.setManaged(false);
+		    			File f = new File("/D:/Funky_Creep/workspace/ImageBank/images/right.png");
+		    			try {
+							main.left.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),50,50,true,true)));
+						} catch (MalformedURLException e1) {
+							e1.printStackTrace();
+						}
 		    		}
 		    		else {
 		    			flow.setManaged(true);
+		    			File f = new File("/D:/Funky_Creep/workspace/ImageBank/images/left.png");
+		    			try {
+							main.left.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),50,50,true,true)));
+						} catch (MalformedURLException e1) {
+							e1.printStackTrace();
+						}
 		    		}
 		    	}
 		    });
@@ -78,6 +92,10 @@ public class Controller {
 			
 			root.setCenter(main);
 			
+			//RIGHT
+			//ListImageView flow2 = new ListImageView(imageDB);
+			//root.setRight(flow2);
+			
 			//BOTTOM
 		    HBox control = new HBox();
 		    Button previous = new Button();
@@ -90,8 +108,7 @@ public class Controller {
 		    
 		    previous.setOnAction(new EventHandler<ActionEvent>() {
 			    @Override public void handle(ActionEvent e) {
-			        //main.displayImage(image);
-			    	//imageDB.show
+			    	imageDB.showPreviousImage();
 			    }
 			});
 		    
@@ -105,17 +122,13 @@ public class Controller {
 		    
 		    next.setOnAction(new EventHandler<ActionEvent>() {
 			    @Override public void handle(ActionEvent e) {
-			        //main.displayImage(image);
-			    	//imageDB.show
+			    	imageDB.showNextImage();
 			    }
 			});
 		    
 		    control.getChildren().addAll(previous,next);
 		    control.setAlignment(Pos.CENTER);
 		    root.setBottom(control);
-		    
-			//ListImageView flow2 = new ListImageView(imageDB);
-			//root.setRight(flow2);
 		    
 			scene = new Scene(root, 1800,1000);
 

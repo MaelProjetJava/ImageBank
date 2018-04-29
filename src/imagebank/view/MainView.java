@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 
 import imagebank.model.Image;
+import imagebank.model.ImageDB;
 import imagebank.model.ImageDBEvent;
 import imagebank.model.ImageDBListener;
 import javafx.event.ActionEvent;
@@ -17,12 +18,15 @@ import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 
 public class MainView extends BorderPane implements ImageDBListener {
+	
+	ImageDB imageDB;
 
 	public ControlButton left = new ControlButton(new File("/D:/Funky_Creep/workspace/ImageBank/images/left.png"));
     public ControlButton right = new ControlButton(new File("/D:/Funky_Creep/workspace/ImageBank/images/right.png"));
 	
-	public MainView() {
+	public MainView(ImageDB i) {
 		super();
+		this.imageDB=i;
 		this.setStyle("-fx-background-color: yellow;");
 	    HBox hbox1 = new HBox();
 		hbox1.getChildren().add(left);
@@ -35,18 +39,18 @@ public class MainView extends BorderPane implements ImageDBListener {
 	}
 	
 	public void displayImage(Image i) {
-		System.out.println("cc");
-		/*ImageView iv = new ImageView();
+		ImageView iv = new ImageView();
 		iv.setImage(i.getFxImage());
 		iv.setFitWidth(1200);
 		iv.setPreserveRatio(true);
 		iv.setSmooth(true);
         iv.setCache(true);
-		this.setCenter(iv);*/
+		this.setCenter(iv);
 	}
 
 	@Override
 	public void imageDBChanged(ImageDBEvent event) {
-		
+		Image i = imageDB.getCurrentImage();
+		displayImage(i);
 	}
 }
