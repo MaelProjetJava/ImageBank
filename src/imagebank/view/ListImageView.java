@@ -25,10 +25,9 @@ public class ListImageView extends TilePane implements ImageDBListener {
 	public ListImageView(ImageDB i) {
 		super();
 		this.imageDB=i;
-		
-		this.setPadding(new Insets(0,0,0,0));
-		this.setVgap(0);
-		this.setHgap(0);
+		//this.setPadding(new Insets(5,5,5,5));
+		//this.setVgap(0);
+		//this.setHgap(0);
 		this.setPrefWidth(350);
 		this.setStyle("-fx-background-color: DAE6F3;");
 		
@@ -56,7 +55,7 @@ public class ListImageView extends TilePane implements ImageDBListener {
 			ib.setOnAction(new EventHandler<ActionEvent>() {
 			    @Override public void handle(ActionEvent e) {
 			    	imageDB.setCurrentImage(index);
-			    	System.out.println(imageDB.getSelectedImages().get(index).getName());
+			    	//System.out.println(imageDB.getSelectedImages().get(index).getName());
 			    }
 			});
 			

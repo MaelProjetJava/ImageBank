@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 
 import javax.imageio.stream.ImageInputStream;
 import javafx.application.Application;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -45,10 +46,18 @@ public class Controller {
 			BorderPane root = new BorderPane();
 			
 			//LEFT
+			
 			ListImageView flow = new ListImageView(imageDB);
 			imageDB.addImageDBListener(flow);
 			root.setLeft(flow);
 			
+			ScrollPane scrollpane = new ScrollPane(flow);
+			scrollpane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);    
+			scrollpane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);    
+			scrollpane.setFitToHeight(true);
+			scrollpane.setFitToWidth(true);
+	        root.setLeft(scrollpane);
+	        
 			//CENTER
 			MainView main = new MainView(imageDB);
 			imageDB.addImageDBListener(main);
@@ -57,6 +66,7 @@ public class Controller {
 		    	@Override public void handle (ActionEvent e) {
 		    		if (flow.isManaged()) {
 		    			flow.setManaged(false);
+		    			root.setLeft(null);
 		    			File f = new File("/D:/Funky_Creep/workspace/ImageBank/images/right.png");
 		    			try {
 							main.left.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),50,50,true,true)));
@@ -66,6 +76,7 @@ public class Controller {
 		    		}
 		    		else {
 		    			flow.setManaged(true);
+		    			root.setLeft(scrollpane);
 		    			File f = new File("/D:/Funky_Creep/workspace/ImageBank/images/left.png");
 		    			try {
 							main.left.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),50,50,true,true)));
