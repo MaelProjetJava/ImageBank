@@ -26,15 +26,9 @@ public class ListImageView extends TilePane implements ImageDBListener {
 		super();
 		this.imageDB=i;
 		//this.setPadding(new Insets(5,5,5,5));
-		//this.setVgap(0);
-		//this.setHgap(0);
-		this.setPrefWidth(350);
-		this.setStyle("-fx-background-color: DAE6F3;");
-		
-		/*
-	        Rectangle2D square = new Rectangle2D(50,50,150,150);
-	        pages[i].setViewport(square);
-	    */
+		this.setPrefColumns(2);
+		this.setPrefWidth(300);
+		this.setStyle("-fx-background-color: #EFEFEF;");
 	}
 
 	@Override
@@ -44,7 +38,7 @@ public class ListImageView extends TilePane implements ImageDBListener {
 			ImageView iv = new ImageView();
 			imagebank.model.Image img = imageDB.getSelectedImages().get(i);
 			iv.setImage(img.getFxImage());
-			iv.setFitWidth(150);
+			iv.setFitWidth(125);
 			iv.setPreserveRatio(true);
 			iv.setSmooth(true);
 	        iv.setCache(true);

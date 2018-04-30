@@ -34,10 +34,13 @@ public class Controller {
 		MainView main;
 		MetadataView meta;
 		ImageDB imageDB;
+		String s = "/D:/Funky_Creep/workspace/ImageBank/images/";
+		public static boolean leftClosed;
+		public static boolean rightClosed;
 		
 		public Controller() {
 			try {
-				imageDB = new ImageDB(new File("/D:/Funky_Creep/workspace/ImageBank/images/liste_images"));
+				imageDB = new ImageDB(new File(s+"liste_images"));
 			} catch (IOException e) {
 				System.out.println("Erreur");
 				e.printStackTrace();
@@ -52,7 +55,7 @@ public class Controller {
 			
 			//LEFT
 			
-			ListImageView flow = new ListImageView(imageDB);
+			flow = new ListImageView(imageDB);
 			imageDB.addImageDBListener(flow);
 			root.setLeft(flow);
 			
@@ -64,7 +67,7 @@ public class Controller {
 	        root.setLeft(scrollpane);
 	        
 			//CENTER
-			MainView main = new MainView(imageDB);
+			main = new MainView(imageDB);
 			imageDB.addImageDBListener(main);
 			
 			main.left.setOnAction(new EventHandler<ActionEvent>() {
@@ -72,51 +75,78 @@ public class Controller {
 		    		if (flow.isManaged()) {
 		    			flow.setManaged(false);
 		    			root.setLeft(null);
-		    			File f = new File("/D:/Funky_Creep/workspace/ImageBank/images/right.png");
+		    			File f = new File(s+"right.png");
 		    			try {
 							main.left.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),50,50,true,true)));
 						} catch (MalformedURLException e1) {
 							e1.printStackTrace();
 						}
+		    			leftClosed=true;
 		    		}
 		    		else {
 		    			flow.setManaged(true);
 		    			root.setLeft(scrollpane);
-		    			File f = new File("/D:/Funky_Creep/workspace/ImageBank/images/left.png");
+		    			File f = new File(s+"left.png");
 		    			try {
 							main.left.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),50,50,true,true)));
 						} catch (MalformedURLException e1) {
 							e1.printStackTrace();
 						}
+		    			leftClosed=false;
 		    		}
 		    	}
 		    });
 			
-			//POURQUOI CA MARCHE PAS???????????????????????????????????????????????????????????????
 		    main.right.setOnAction(new EventHandler<ActionEvent>() {
 		    	@Override public void handle (ActionEvent e) {
 		    		if (meta.isManaged()) {
 		    			meta.setManaged(false);
 		    			root.setRight(null);
+		    			File f = new File(s+"left.png");
+		    			try {
+							main.right.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),50,50,true,true)));
+						} catch (MalformedURLException e1) {
+							e1.printStackTrace();
+						}
+		    			rightClosed=true;
 		    		}
 		    		else {
 		    			meta.setManaged(true);
 		    			root.setRight(meta);
+		    			File f = new File(s+"right.png");
+		    			try {
+							main.right.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),50,50,true,true)));
+						} catch (MalformedURLException e1) {
+							e1.printStackTrace();
+						}
+		    			rightClosed=false;
 		    		}
 		    	}
 		    });
 		    
-			
 			root.setCenter(main);
 			
 			//RIGHT
-			MetadataView meta = new MetadataView(imageDB);
+			meta = new MetadataView(imageDB);
+			imageDB.addImageDBListener(meta);
+			
+			meta.addEventFilter(KeyEvent.KEY_PRESSED, event ->{
+				event.consume();
+			});
+			
 			root.setRight(meta);
+			
+			ScrollPane scrollpane2 = new ScrollPane(meta);
+			scrollpane2.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+			scrollpane2.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+			scrollpane2.setFitToHeight(true);
+			scrollpane2.setFitToWidth(true);
+			root.setRight(scrollpane2);
 			
 			//BOTTOM
 		    HBox control = new HBox();
 		    Button previous = new Button();
-		    File f1 = new File("/D:/Funky_Creep/workspace/ImageBank/images/previous.png");
+		    File f1 = new File(s+"previous.png");
 		    try {
 				previous.setGraphic(new ImageView(new Image(f1.toURI().toURL().toString(),50,50,true,true)));
 			} catch (MalformedURLException e) {
@@ -130,7 +160,7 @@ public class Controller {
 			});
 		    
 		    Button next = new Button();
-		    File f2 = new File("/D:/Funky_Creep/workspace/ImageBank/images/next.png");
+		    File f2 = new File(s+"next.png");
 		    try {
 				next.setGraphic(new ImageView(new Image(f2.toURI().toURL().toString(),50,50,true,true)));
 			} catch (MalformedURLException e) {
@@ -145,6 +175,7 @@ public class Controller {
 		    
 		    control.getChildren().addAll(previous,next);
 		    control.setAlignment(Pos.CENTER);
+		    control.setStyle("-fx-background-color: #EFEFEF;");
 		    
 		    root.addEventFilter(KeyEvent.KEY_PRESSED, event->{
 	            if (event.getCode() == KeyCode.LEFT) {
@@ -160,7 +191,7 @@ public class Controller {
 		    
 		    root.setBottom(control);
 		    
-			scene = new Scene(root, 1800,1000);
+			scene = new Scene(root,1800,1000);
 
 			primaryStage.setScene(scene);
 			primaryStage.show();

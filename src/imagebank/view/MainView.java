@@ -3,6 +3,7 @@ package imagebank.view;
 import java.io.File;
 import java.net.MalformedURLException;
 
+import imagebank.Controller;
 import imagebank.model.Image;
 import imagebank.model.ImageDB;
 import imagebank.model.ImageDBEvent;
@@ -27,7 +28,7 @@ public class MainView extends BorderPane implements ImageDBListener {
 	public MainView(ImageDB i) {
 		super();
 		this.imageDB=i;
-		this.setStyle("-fx-background-color: white;");
+		this.setStyle("-fx-background-color: grey;");
 	    HBox hbox1 = new HBox();
 		hbox1.getChildren().add(left);
 		hbox1.setAlignment(Pos.CENTER);
@@ -41,16 +42,21 @@ public class MainView extends BorderPane implements ImageDBListener {
 	public void displayImage(Image i) {
 		ImageView iv = new ImageView();
 		iv.setImage(i.getFxImage());
-		iv.setFitWidth(1000);
 		iv.setPreserveRatio(true);
 		iv.setSmooth(true);
         iv.setCache(true);
 		this.setCenter(iv);
+		if (Controller.leftClosed && Controller.rightClosed) {
+			iv.setFitWidth(1300);
+		}
+		else {
+			iv.setFitWidth(1000);
+		}
 	}
 
 	@Override
 	public void imageDBChanged(ImageDBEvent event) {
-		Image i = imageDB.getCurrentImage();
-		displayImage(i);
+		Image img = imageDB.getCurrentImage();
+		displayImage(img);
 	}
 }
