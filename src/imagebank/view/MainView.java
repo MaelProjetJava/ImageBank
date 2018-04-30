@@ -27,7 +27,7 @@ public class MainView extends BorderPane implements ImageDBListener {
 	public MainView(ImageDB i) {
 		super();
 		this.imageDB=i;
-		this.setStyle("-fx-background-color: yellow;");
+		this.setStyle("-fx-background-color: white;");
 	    HBox hbox1 = new HBox();
 		hbox1.getChildren().add(left);
 		hbox1.setAlignment(Pos.CENTER);
@@ -41,7 +41,7 @@ public class MainView extends BorderPane implements ImageDBListener {
 	public void displayImage(Image i) {
 		ImageView iv = new ImageView();
 		iv.setImage(i.getFxImage());
-		iv.setFitWidth(1200);
+		iv.setFitWidth(1000);
 		iv.setPreserveRatio(true);
 		iv.setSmooth(true);
         iv.setCache(true);

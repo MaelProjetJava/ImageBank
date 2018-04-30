@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 
 import javax.imageio.stream.ImageInputStream;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -18,16 +19,20 @@ import javafx.geometry.*;
 import javafx.scene.text.*;
 import javafx.event.*;
 import javafx.scene.image.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.shape.*;
 import imagebank.model.ImageDB;
 import imagebank.view.ListImageView;
 import imagebank.view.MainView;
+import imagebank.view.MetadataView;
 
 public class Controller {
 
 		Scene scene;
 		ListImageView flow;
 		MainView main;
+		MetadataView meta;
 		ImageDB imageDB;
 		
 		public Controller() {
@@ -86,26 +91,27 @@ public class Controller {
 		    		}
 		    	}
 		    });
-		    
-		    /*main.right.setOnAction(new EventHandler<ActionEvent>() {
+			
+			//POURQUOI CA MARCHE PAS???????????????????????????????????????????????????????????????
+		    main.right.setOnAction(new EventHandler<ActionEvent>() {
 		    	@Override public void handle (ActionEvent e) {
-		    		if (flow2.isManaged()) {
-		    			//flow2.setVisible(false);
-		    			flow2.setManaged(false);
+		    		if (meta.isManaged()) {
+		    			meta.setManaged(false);
+		    			root.setRight(null);
 		    		}
 		    		else {
-		    			//flow2.setVisible(true);
-		    			flow2.setManaged(true);
+		    			meta.setManaged(true);
+		    			root.setRight(meta);
 		    		}
 		    	}
-		    });*/
+		    });
 		    
 			
 			root.setCenter(main);
 			
 			//RIGHT
-			//ListImageView flow2 = new ListImageView(imageDB);
-			//root.setRight(flow2);
+			MetadataView meta = new MetadataView(imageDB);
+			root.setRight(meta);
 			
 			//BOTTOM
 		    HBox control = new HBox();
@@ -139,6 +145,19 @@ public class Controller {
 		    
 		    control.getChildren().addAll(previous,next);
 		    control.setAlignment(Pos.CENTER);
+		    
+		    root.addEventFilter(KeyEvent.KEY_PRESSED, event->{
+	            if (event.getCode() == KeyCode.LEFT) {
+	            	imageDB.showPreviousImage();
+	            }
+	        });
+		    
+		    root.addEventFilter(KeyEvent.KEY_PRESSED, event->{
+	            if (event.getCode() == KeyCode.RIGHT) {
+	            	imageDB.showNextImage();
+	            }
+	        });
+		    
 		    root.setBottom(control);
 		    
 			scene = new Scene(root, 1800,1000);
