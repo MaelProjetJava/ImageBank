@@ -11,6 +11,7 @@ import imagebank.model.tag.Tagger;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
@@ -24,6 +25,7 @@ import javafx.util.converter.IntegerStringConverter;
 public class MetadataView extends TabPane implements ImageDBListener {
 
 	ImageDB imageDB;
+	VBox main;
 	
 	public MetadataView(ImageDB i) {
 		super();
@@ -41,29 +43,36 @@ public class MetadataView extends TabPane implements ImageDBListener {
 		this.getTabs().add(tab1);
 		this.getTabs().add(tab2);
 		
-		this.setTabMinWidth(100);
-		this.setTabMaxWidth(160);
+		this.setTabMinWidth(130);
+		this.setTabMaxWidth(130);
 		this.setTabMinHeight(30);
 		this.setTabMaxHeight(30);
+		this.setPrefWidth(300);
+		
+		
 	}
 
 	@Override
 	public void imageDBChanged(ImageDBEvent event) {
 		Image img = imageDB.getCurrentImage();
-		//this.getTabs().clear();
 		VBox main = new VBox();
-		main.setPrefWidth(250);
+		
+		ScrollPane scrollpane2 = new ScrollPane(main);
+		scrollpane2.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);    
+		scrollpane2.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+		scrollpane2.setFitToHeight(true);
+		scrollpane2.setFitToWidth(true);
+		
 		for (Tag t : img.getTags()) {
 			VBox vbox = new VBox();
-			//vbox.setPrefWidth(250);
+			
 			String l = t.getName();
 			if (t.hasValue()) {
 				l = l + ":" + " " + t.getValue();
 			}
 			
-			System.out.println(l);
+			//System.out.println(l);
 			Text text = new Text(l);
-			//text.setTextAlignment(TextAlignment.CENTER);
 			vbox.getChildren().add(text);
 			
 			Button modify = new Button("Modify");
@@ -114,7 +123,7 @@ public class MetadataView extends TabPane implements ImageDBListener {
 			
 			vbox.setSpacing(10);
 			main.getChildren().add(vbox);
-			main.setSpacing(20);
+			main.setSpacing(40);
 		}
 		
 		Button addmetadata = new Button("Add new metadata");
@@ -139,7 +148,7 @@ public class MetadataView extends TabPane implements ImageDBListener {
 		    }
 		});
 		
-		this.getTabs().get(0).setContent(main);
+		this.getTabs().get(0).setContent(scrollpane2);
 	}
 	
 }

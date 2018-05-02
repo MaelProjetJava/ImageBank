@@ -61,7 +61,7 @@ public class Controller {
 			
 			ScrollPane scrollpane = new ScrollPane(flow);
 			scrollpane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);    
-			scrollpane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);    
+			scrollpane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 			scrollpane.setFitToHeight(true);
 			scrollpane.setFitToWidth(true);
 	        root.setLeft(scrollpane);
@@ -136,12 +136,6 @@ public class Controller {
 			
 			root.setRight(meta);
 			
-			ScrollPane scrollpane2 = new ScrollPane(meta);
-			scrollpane2.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-			scrollpane2.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-			scrollpane2.setFitToHeight(true);
-			scrollpane2.setFitToWidth(true);
-			root.setRight(scrollpane2);
 			
 			//BOTTOM
 		    HBox control = new HBox();

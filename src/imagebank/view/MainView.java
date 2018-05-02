@@ -48,9 +48,11 @@ public class MainView extends BorderPane implements ImageDBListener {
 		this.setCenter(iv);
 		if (Controller.leftClosed && Controller.rightClosed) {
 			iv.setFitWidth(1300);
+			iv.setFitHeight(800);
 		}
 		else {
-			iv.setFitWidth(1000);
+			iv.setFitWidth(900);
+			iv.setFitHeight(800);
 		}
 	}
 
