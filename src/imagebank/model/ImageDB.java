@@ -99,6 +99,7 @@ public class ImageDB implements TaggerListener {
 		}
 
 		currentImageIndex = index;
+		notifyChanges();
 	}
 
 	public void showNextImage() {
