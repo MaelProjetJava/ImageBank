@@ -19,6 +19,11 @@ public class Main extends Application {
 		controller.start(primaryStage);
 	}
 
+	@Override
+	public void stop() throws Exception {
+		controller.stop();
+	}
+
 	public static void main(String args[]) {
 		launch(args);
 	}

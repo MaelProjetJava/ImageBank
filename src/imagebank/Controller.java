@@ -196,4 +196,7 @@ public class Controller {
 			
 	}
 
+	public void stop() throws Exception {
+		imageDB.save();
+	}
 }
