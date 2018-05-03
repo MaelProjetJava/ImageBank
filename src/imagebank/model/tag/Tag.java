@@ -93,7 +93,7 @@ public class Tag extends TaggableObject {
 			public boolean hasNext() {
 				return currentPath != null && getNodeFromPath(
 					valuesTreeRoot, currentPath).getKey()
-							< end;
+							<= end;
 			}
 
 			@Override
@@ -104,7 +104,7 @@ public class Tag extends TaggableObject {
 				Node<Long,Tag> node = getNodeFromPath(
 						valuesTreeRoot, currentPath);
 
-				if (node.getKey() >= end)
+				if (node.getKey() > end)
 					throw new NoSuchElementException();
 
 				currentPath = successor(valuesTreeRoot,
