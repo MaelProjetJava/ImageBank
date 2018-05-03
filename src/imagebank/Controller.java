@@ -34,7 +34,7 @@ public class Controller {
 		MainView main;
 		MetadataView meta;
 		ImageDB imageDB;
-		String s = "/D:/Funky_Creep/workspace/ImageBank/images/";
+		String s = "images/";
 		public static boolean leftClosed;
 		public static boolean rightClosed;
 		public static int WIDTH=800;

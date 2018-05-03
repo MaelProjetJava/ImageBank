@@ -22,8 +22,8 @@ public class MainView extends BorderPane implements ImageDBListener {
 	
 	ImageDB imageDB;
 
-	public ControlButton left = new ControlButton(new File("/D:/Funky_Creep/workspace/ImageBank/images/left.png"));
-    public ControlButton right = new ControlButton(new File("/D:/Funky_Creep/workspace/ImageBank/images/right.png"));
+	public ControlButton left = new ControlButton(new File("images/left.png"));
+    public ControlButton right = new ControlButton(new File("images/right.png"));
 	
 	public MainView(ImageDB i) {
 		super();
