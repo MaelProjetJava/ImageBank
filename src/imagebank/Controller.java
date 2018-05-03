@@ -37,6 +37,8 @@ public class Controller {
 		String s = "/D:/Funky_Creep/workspace/ImageBank/images/";
 		public static boolean leftClosed;
 		public static boolean rightClosed;
+		public static int WIDTH=800;
+		public static int HEIGHT=600;
 		
 		public Controller() {
 			try {
@@ -77,7 +79,7 @@ public class Controller {
 		    			root.setLeft(null);
 		    			File f = new File(s+"right.png");
 		    			try {
-							main.left.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),50,50,true,true)));
+							main.left.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),Controller.WIDTH/25,Controller.WIDTH/25,true,true)));
 						} catch (MalformedURLException e1) {
 							e1.printStackTrace();
 						}
@@ -88,7 +90,7 @@ public class Controller {
 		    			root.setLeft(scrollpane);
 		    			File f = new File(s+"left.png");
 		    			try {
-							main.left.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),50,50,true,true)));
+							main.left.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),Controller.WIDTH/25,Controller.WIDTH/25,true,true)));
 						} catch (MalformedURLException e1) {
 							e1.printStackTrace();
 						}
@@ -104,7 +106,7 @@ public class Controller {
 		    			root.setRight(null);
 		    			File f = new File(s+"left.png");
 		    			try {
-							main.right.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),50,50,true,true)));
+							main.right.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),Controller.WIDTH/25,Controller.WIDTH/25,true,true)));
 						} catch (MalformedURLException e1) {
 							e1.printStackTrace();
 						}
@@ -115,7 +117,7 @@ public class Controller {
 		    			root.setRight(meta);
 		    			File f = new File(s+"right.png");
 		    			try {
-							main.right.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),50,50,true,true)));
+							main.right.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),Controller.WIDTH/25,Controller.WIDTH/25,true,true)));
 						} catch (MalformedURLException e1) {
 							e1.printStackTrace();
 						}
@@ -131,7 +133,9 @@ public class Controller {
 			imageDB.addImageDBListener(meta);
 			
 			meta.addEventFilter(KeyEvent.KEY_PRESSED, event ->{
-				event.consume();
+				if (event.getCode() == KeyCode.LEFT || event.getCode() == KeyCode.RIGHT) {
+					event.consume();
+				}
 			});
 			
 			root.setRight(meta);
@@ -142,7 +146,7 @@ public class Controller {
 		    Button previous = new Button();
 		    File f1 = new File(s+"previous.png");
 		    try {
-				previous.setGraphic(new ImageView(new Image(f1.toURI().toURL().toString(),50,50,true,true)));
+				previous.setGraphic(new ImageView(new Image(f1.toURI().toURL().toString(),Controller.WIDTH/25,Controller.WIDTH/25,true,true)));
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}
@@ -156,7 +160,7 @@ public class Controller {
 		    Button next = new Button();
 		    File f2 = new File(s+"next.png");
 		    try {
-				next.setGraphic(new ImageView(new Image(f2.toURI().toURL().toString(),50,50,true,true)));
+				next.setGraphic(new ImageView(new Image(f2.toURI().toURL().toString(),Controller.WIDTH/25,Controller.WIDTH/25,true,true)));
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}
@@ -185,7 +189,7 @@ public class Controller {
 		    
 		    root.setBottom(control);
 		    
-			scene = new Scene(root,1800,1000);
+			scene = new Scene(root,WIDTH,HEIGHT);
 
 			primaryStage.setScene(scene);
 			primaryStage.show();

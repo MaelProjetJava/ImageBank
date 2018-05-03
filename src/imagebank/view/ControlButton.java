@@ -4,6 +4,7 @@ import javafx.scene.image.*;
 import java.io.File;
 import java.net.MalformedURLException;
 
+import imagebank.Controller;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
@@ -15,7 +16,7 @@ public class ControlButton extends Button {
 		super();
 		try {
 			this.setMaxWidth(100);
-			this.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),50,50,true,true)));
+			this.setGraphic(new ImageView(new Image(f.toURI().toURL().toString(),Controller.WIDTH/25,Controller.WIDTH/25,true,true)));
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
