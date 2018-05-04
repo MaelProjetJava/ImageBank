@@ -1,9 +1,7 @@
 package imagebank;
 
 import javafx.application.Application;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.scene.Scene;
 
 public class Main extends Application {
 

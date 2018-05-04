@@ -134,5 +134,6 @@ public class ImageDB implements TaggerListener {
 		selectedImages = images.getImagesFile().values().stream()
 			.filter(i -> filter(i, criteria))
 			.collect(Collectors.toCollection(ArrayList::new));
+		notifyChanges();
 	}
 }

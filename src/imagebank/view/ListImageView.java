@@ -1,19 +1,10 @@
 package imagebank.view;
-import java.io.File;
-import java.util.List;
-
 import imagebank.model.ImageDB;
 import imagebank.model.ImageDBEvent;
 import imagebank.model.ImageDBListener;
-import imagebank.model.ImageFile;
-import imagebank.model.NotDirectoryException;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import imagebank.Controller;

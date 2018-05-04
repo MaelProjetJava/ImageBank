@@ -8,64 +8,68 @@ import java.util.Iterator;
 import org.omg.IOP.TAG_ORB_TYPE;
 
 import imagebank.model.ImageDB;
+import imagebank.model.ImageDBEvent;
+import imagebank.model.ImageDBListener;
 import imagebank.model.tag.Tagger;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 public class SearchView extends Tab {
 	
+	ImageDB imageDB;
+	
 	public SearchView(ImageDB i) {
 		super("Search");
-		ComboBox<String> format_box = new ComboBox<String>();
-		ComboBox<Integer> size_box = new ComboBox<Integer>();
-		ComboBox<String> color_box = new ComboBox<String>();
-		ComboBox<String> color_box2 = new ComboBox<String>();
-		ComboBox<Integer> width_box = new ComboBox<Integer>();
-		ComboBox<Integer> height_box = new ComboBox<Integer>();
+		this.setClosable(false);
+		this.imageDB=i;
 		
-		format_box.getItems().addAll("JPEG", "PNG");
-		size_box.getItems().addAll(20480, 40960, 61440, 81920, 192512);
-		color_box.getItems().addAll(
-				"Red","Brown","Yellow","Green",
-				"Cyan","DarkCyan","Blue","DarkMagenta",
-				"Magenta","White","LightGray","Gray",
-				"DarkGray","Black");
-		color_box2.getItems().addAll(
-				"Red","Brown","Yellow","Green",
-				"Cyan","DarkCyan","Blue","DarkMagenta",
-				"Magenta","White","LightGray","Gray",
-				"DarkGray","Black");
-		width_box.getItems().addAll(500, 800, 1024, 1600, 1920);
-		height_box.getItems().addAll(500, 600, 720, 1200, 1080);
+		VBox main2 = new VBox();
+		main2.setPadding(new Insets(0,0,0,5));
+
+		ScrollPane scrollpane2 = new ScrollPane(main2);
+		scrollpane2.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);    
+		scrollpane2.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+		scrollpane2.setFitToHeight(true);
 		
-		String[] tag_names = {"Format", "Color 1", "Color 2", "Size", "Width", "Height"};
-		ComboBox[] comboboxes = {format_box, color_box, color_box2, size_box, width_box, height_box};
-		ArrayList<Tag> criteria = new ArrayList<Tag>();
-		GridPane grid = new GridPane();
-		grid.setVgap(10);
-		grid.setHgap(5);
-		for(int j=0; j<tag_names.length; j++) {
-			Text t = new Text(tag_names[j]);
-			grid.add(t, 1, j+1);
-			grid.add(comboboxes[j], 2, j+1);
+		ArrayList<Tag> tab_recherche = new ArrayList<Tag>(50);
+		
+		Iterable<Tag> tags = Tagger.getAllTags();
+		Iterator<Tag> it = tags.iterator();
+		while (it.hasNext()) {
+			String s = (String) it.next().getName();
+			CheckBox check = new CheckBox(s);
+			
+			check.setOnAction(new EventHandler<ActionEvent>() {
+	    		@Override public void handle(ActionEvent e) {
+	    			if (check.isSelected()) {
+	    				tab_recherche.add(Tagger.getTag(s));
+	    				Tag tab_recherche_array[] = new Tag[tab_recherche.size()];
+	    				tab_recherche_array=tab_recherche.toArray(tab_recherche_array);
+	    				imageDB.search(tab_recherche_array);
+	    			}
+	    			else if (!check.isSelected()) {
+	    				tab_recherche.remove(Tagger.getTag(s));
+	    				Tag tab_recherche_array[] = new Tag[tab_recherche.size()];
+	    				tab_recherche_array=tab_recherche.toArray(tab_recherche_array);
+	    				imageDB.search(tab_recherche_array);
+	    			}
+	    			
+	    		}
+	    	});
+
+			main2.getChildren().add(check);
 		}
-		Button b = new Button("search");
-		b.setOnAction(new EventHandler<ActionEvent>() {
-			@Override public void handle(ActionEvent e) {
-				for(int j=0; j<comboboxes.length; j++) {
-					System.out.println(comboboxes[j].getValue());
-					if(comboboxes[j].getValue()!=null) {
-						
-					}
-				}
-			}
-		});
-		grid.add(b, 1, 7);
-		this.setContent(grid);
+		
+		this.setContent(scrollpane2);
 	}
+
 }

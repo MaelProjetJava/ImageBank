@@ -1,21 +1,14 @@
 package imagebank.view;
 
 import java.io.File;
-import java.net.MalformedURLException;
-
 import imagebank.Controller;
 import imagebank.model.Image;
 import imagebank.model.ImageDB;
 import imagebank.model.ImageDBEvent;
 import imagebank.model.ImageDBListener;
-import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 
 public class MainView extends BorderPane implements ImageDBListener {

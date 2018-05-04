@@ -1,11 +1,9 @@
 package imagebank.view;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-
 import imagebank.Controller;
-import imagebank.model.DominantColor;
 import imagebank.model.Image;
 import imagebank.model.ImageDB;
 import imagebank.model.ImageDBEvent;
@@ -16,23 +14,23 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.util.converter.IntegerStringConverter;
 
 public class MetadataView extends TabPane implements ImageDBListener {
 
 	ImageDB imageDB;
 	VBox main;
+	String[] colors = {"Red","Brown","Yellow","Green",
+			"Cyan","DarkCyan","Blue","DarkMagenta",
+			"Magenta","White","LightGray","Gray",
+			"DarkGray","Black"};
 	
 	public MetadataView(ImageDB i) {
 		super();
@@ -42,11 +40,9 @@ public class MetadataView extends TabPane implements ImageDBListener {
 		Tab tab1 = new Tab();
 		tab1.setClosable(false);
 		tab1.setText("Metadata");
-		Tab tab2 = new Tab();
-		tab2.setClosable(false);
-		tab2.setText("Search");
 		
-		//tab2.setContent();
+		SearchView tab2 = new SearchView(i);
+		
 		this.getTabs().add(tab1);
 		this.getTabs().add(tab2);
 		
@@ -55,43 +51,43 @@ public class MetadataView extends TabPane implements ImageDBListener {
 		this.setTabMinHeight(30);
 		this.setTabMaxHeight(30);
 		this.setPrefWidth(Controller.WIDTH/5);
-		
-		
 	}
 
 	@Override
 	public void imageDBChanged(ImageDBEvent event) {
 		Image img = imageDB.getCurrentImage();
+		
+		//TAB 0
 		VBox main = new VBox();
 		main.setPadding(new Insets(0,0,0,5));
-		ScrollPane scrollpane2 = new ScrollPane(main);
-		scrollpane2.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);    
-		scrollpane2.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-		scrollpane2.setFitToHeight(true);
-		scrollpane2.setFitToWidth(true);
+		ScrollPane scrollpane = new ScrollPane(main);
+		scrollpane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);    
+		scrollpane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+		scrollpane.setFitToHeight(true);
+		scrollpane.setFitToWidth(true);
 		
-		LinkedHashSet hashset = new LinkedHashSet();
+		LinkedHashSet<Tag> hashset = new LinkedHashSet<Tag>();
 		hashset.add(Tagger.getTag("Format"));
 		hashset.add(Tagger.getTag("Path"));
 		hashset.add(Tagger.getTag("Owner"));
+		hashset.add(Tagger.getTag("Size"));
+		hashset.add(Tagger.getTag("Width"));
+		hashset.add(Tagger.getTag("Height"));
+		for (int i=0;i<colors.length;i++) {
+			hashset.add(Tagger.getTag(colors[i]));
+		}
+		
 		for (Tag t : img.getTags()) {
 			String l = t.getName();
-			DominantColor d = new DominantColor();
-			for (int i=0;i<d.getAllNameColors().length;i++) {
-				if (l==d.getAllNameColors()[i]) {
-					hashset.add(t);
-				}
-			}
-			if (l=="Size" || l=="Width" || l=="Height") {
-				hashset.add(t);
-			}
-			Iterator e = hashset.iterator();
+			
+			Iterator<Tag> e = hashset.iterator();
 			boolean trouve=false;
 			while (e.hasNext() && !trouve) {
-				if (t.hasTag((Tag)e.next())) {
+				if (t.hasTag(e.next()) && !hashset.contains(t)) {
 					hashset.add(t);
 					trouve=true;
 				}
+				
 			}
 			VBox vbox = new VBox();
 			
@@ -101,8 +97,8 @@ public class MetadataView extends TabPane implements ImageDBListener {
 			
 			Text text = new Text(l);
 			vbox.getChildren().add(text);
-			
-			if (!hashset.contains(t) ) {
+
+			if (!hashset.contains(Tagger.getTag(t.getName())) ) {
 				Button modify = new Button("Modify");
 				vbox.getChildren().add(modify);
 				
@@ -223,7 +219,8 @@ public class MetadataView extends TabPane implements ImageDBListener {
 		    	
 		});
 		
-		this.getTabs().get(0).setContent(scrollpane2);
+		this.getTabs().get(0).setContent(scrollpane);
+		
 	}
 	
 }

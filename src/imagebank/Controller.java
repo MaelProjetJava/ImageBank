@@ -6,22 +6,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import javax.imageio.stream.ImageInputStream;
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.*;
-import javafx.stage.Stage;
 import javafx.geometry.*;
-import javafx.scene.text.*;
 import javafx.event.*;
 import javafx.scene.image.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.shape.*;
 import imagebank.model.ImageDB;
 import imagebank.view.ListImageView;
 import imagebank.view.MainView;
@@ -56,7 +48,6 @@ public class Controller {
 			BorderPane root = new BorderPane();
 			
 			//LEFT
-			
 			flow = new ListImageView(imageDB);
 			imageDB.addImageDBListener(flow);
 			root.setLeft(flow);
@@ -140,7 +131,6 @@ public class Controller {
 			
 			root.setRight(meta);
 			
-			
 			//BOTTOM
 		    HBox control = new HBox();
 		    Button previous = new Button();
@@ -190,7 +180,6 @@ public class Controller {
 		    root.setBottom(control);
 		    
 			scene = new Scene(root,WIDTH,HEIGHT);
-
 			primaryStage.setScene(scene);
 			primaryStage.show();
 			
